@@ -285,6 +285,23 @@ static const unsigned char * const form_row_attrs[]=
 <script type="text/javascript">
 $(function() {
     $('#ContestAccordion').accordion({ heightStyle: "content" <% if (active > 0) { %>, active: <s:v value="active" /><% } %> });
+    var inlineUserContest = $("#Ori_user_contest");
+
+    $.ajax({
+        url: self_url,
+        data: {
+            SID: SID,
+            action: '<s:ac ac="get-contest-list" />'
+        },
+        dataType: "text",
+
+        success: function(data) {
+            inlineUserContest.html(data);
+            inlineUserContest.val(
+                inlineUserContest.attr("data-current") || "0"
+            );
+        }
+    });
     dialog = $("#BasicDialogDiv").dialog({
         autoOpen: false,
         height: 300,
@@ -377,7 +394,16 @@ $(function() {
     });
     $('#RegistrationDialo_reg_deadline_time').timepicker({ 'timeFormat': 'H:i', 'step': 30 });
     $('#RegistrationDialo_reg_deadline_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
+    $('#Ori_reg_deadline_time').timepicker({
+    'timeFormat': 'H:i',
+    'step': 30
+});
 
+$('#Ori_reg_deadline_date').datepicker({
+    dateFormat: "yy-mm-dd",
+    firstDay: 1,
+    showButtonPanel: true
+});
     timingDialog = $("#TimingDialogDiv").dialog({
         autoOpen: false,
         height: 500,
@@ -414,7 +440,35 @@ $(function() {
     $('#TimingDialo_open_time_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
     $('#TimingDialo_close_time_time').timepicker({ 'timeFormat': 'H:i', 'step': 30 });
     $('#TimingDialo_close_time_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
+    $('#Ori_sched_time_time').timepicker({
+        'timeFormat': 'H:i',
+        'step': 30
+    });
+    $('#Ori_sched_time_date').datepicker({
+        dateFormat: "yy-mm-dd",
+        firstDay: 1,
+        showButtonPanel: true
+    });
 
+    $('#Ori_open_time_time').timepicker({
+        'timeFormat': 'H:i',
+        'step': 30
+    });
+    $('#Ori_open_time_date').datepicker({
+        dateFormat: "yy-mm-dd",
+        firstDay: 1,
+        showButtonPanel: true
+    });
+
+    $('#Ori_close_time_time').timepicker({
+        'timeFormat': 'H:i',
+        'step': 30
+    });
+    $('#Ori_close_time_date').datepicker({
+        dateFormat: "yy-mm-dd",
+        firstDay: 1,
+        showButtonPanel: true
+    });
     urlDialog = $("#UrlDialogDiv").dialog({
         autoOpen: false,
         height: 500,
@@ -570,7 +624,489 @@ $(function() {
         }
     });
 });
+function saveInlineName(e)
+{
+    if (e) e.stopPropagation();
 
+    var selWidget = document.getElementById("BasicDialo_user_contest");
+
+    function submitBasicForm()
+    {
+        document.getElementById("BasicDialo_name").value =
+            document.getElementById("Ori_name").value;
+
+        document.getElementById("BasicDialo_name_en").value =
+            document.getElementById("Ori_name_en").value;
+
+        document.getElementById("BasicDialo_main_url").value =
+            document.getElementById("Ori_main_url").value;
+
+        document.getElementById("BasicDialo_keywords").value =
+            document.getElementById("Ori_keywords").value;
+
+        document.getElementById("BasicDialo_comment").value =
+            document.getElementById("Ori_comment").value;
+
+        $("#BasicDialo_user_contest").val(
+            document.getElementById("Ori_user_contest").value
+        );
+
+        $("#BasicDialo_default_locale").val(
+            document.getElementById("Ori_default_locale").value
+        );
+
+        document.getElementById("BasicDialo_personal").checked =
+            document.getElementById("Ori_personal").checked;
+        var form = $("#BasicDialogForm");
+
+        $.ajax({
+            url: form.attr("action"),
+            type: "POST",
+            data: form.serialize(),
+            dataType: "json",
+
+            success: function(data) {
+                if (data.retval != 0) {
+                    alert(data.messages || "Failed to save settings");
+                    return;
+                }
+
+                window.location.href =
+                    self_url +
+                    '?SID=' + SID +
+                    '&action=' + current_action +
+                    '&active=0';
+            },
+
+            error: function() {
+                alert("Failed to save settings");
+            }
+        });
+    }
+
+    if (selWidget != null && selWidget.options.length == 0) {
+        $.ajax({
+            url: self_url,
+            data: {
+                SID: SID,
+                action: '<s:ac ac="get-contest-list" />'
+            },
+            dataType: "text",
+
+            success: function(data) {
+                $("#BasicDialo_user_contest").html(data);
+                submitBasicForm();
+            },
+
+            error: function() {
+                alert("Failed to load contest list");
+            }
+        });
+    } else {
+        submitBasicForm();
+    }
+}
+function saveInlineRegistration(e)
+{
+    if (e) e.stopPropagation();
+
+    $("#RegistrationDialo_autoregister").val(
+        document.getElementById("Ori_autoregister").value
+    );
+
+    document.getElementById("RegistrationDialo_reg_deadline_time").value =
+        document.getElementById("Ori_reg_deadline_time").value;
+
+    document.getElementById("RegistrationDialo_reg_deadline_date").value =
+        document.getElementById("Ori_reg_deadline_date").value;
+
+    document.getElementById("RegistrationDialo_register_email").value =
+        document.getElementById("Ori_register_email").value;
+
+    document.getElementById("RegistrationDialo_register_url").value =
+        document.getElementById("Ori_register_url").value;
+
+    document.getElementById("RegistrationDialo_register_subject").value =
+        document.getElementById("Ori_register_subject").value;
+
+    document.getElementById("RegistrationDialo_register_subject_en").value =
+        document.getElementById("Ori_register_subject_en").value;
+
+    document.getElementById("RegistrationDialo_register_email_file").value =
+        document.getElementById("Ori_register_email_file").value;
+
+    var form = $("#RegistrationDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=1';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
+function saveInlineTiming(e)
+{
+    if (e) e.stopPropagation();
+
+    var fields = [ "sched_time", "open_time", "close_time" ];
+
+    for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+
+        document.getElementById("TimingDialo_" + field + "_time").value =
+            document.getElementById("Ori_" + field + "_time").value;
+
+        document.getElementById("TimingDialo_" + field + "_date").value =
+            document.getElementById("Ori_" + field + "_date").value;
+    }
+
+    var form = $("#TimingDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=2';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
+function saveInlineUrls(e)
+{
+    if (e) e.stopPropagation();
+
+    var fields = [
+        "team_url",
+        "standings_url",
+        "problems_url",
+        "logo_url",
+        "css_url"
+    ];
+
+    for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+
+        document.getElementById("UrlDialo_" + field).value =
+            document.getElementById("Ori_" + field).value;
+    }
+
+    var form = $("#UrlDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=3';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
+function saveInlineFlags(e)
+{
+    if (e) e.stopPropagation();
+
+    var fields = [
+        "closed",
+        "disable_team_password",
+        "force_password_change",
+        "simple_registration",
+        "send_passwd_email",
+        "invisible",
+        "clean_users",
+        "disable_member_delete",
+        "assign_logins",
+        "force_registration",
+        "disable_name",
+        "enable_password_recovery",
+        "exam_mode",
+        "disable_password_change",
+        "disable_locale_change",
+        "allow_reg_data_edit",
+        "enable_user_telegram",
+        "enable_avatar",
+        "enable_local_pages",
+        "read_only_name",
+        "enable_oauth",
+        "enable_reminders"
+    ];
+
+    for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+
+        var src = document.getElementById("Ori_" + field);
+        var dst = document.getElementById("FlagsDialo_" + field);
+
+        if (src != null && dst != null) {
+            if (src.type == "checkbox") {
+                dst.checked = src.checked;
+            } else {
+                dst.checked = src.value == "1";
+            }
+        }
+    }
+
+    var form = $("#FlagsDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=4';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
+function saveInlineHeaders(e)
+{
+    if (e) e.stopPropagation();
+
+    var fields = [
+        "users_header_file",
+        "users_footer_file",
+        "copyright_file",
+        "welcome_file",
+        "reg_welcome_file"
+    ];
+
+    for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+
+        document.getElementById("HeadersDialo_" + field).value =
+            document.getElementById("Ori_" + field).value;
+    }
+
+    var form = $("#HeadersDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=8';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
+function saveInlineAttrs(e)
+{
+    if (e) e.stopPropagation();
+
+    var fields = [
+        "users_head_style",
+        "users_par_style",
+        "users_table_style",
+        "users_verb_style",
+        "users_table_format",
+        "users_table_format_en",
+        "users_table_legend",
+        "users_table_legend_en",
+        "user_name_comment"
+    ];
+
+    for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+
+        document.getElementById("AttrsDialo_" + field).value =
+            document.getElementById("Ori_" + field).value;
+    }
+
+    var form = $("#AttrsDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=9';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
+function saveInlineNotifications(e)
+{
+    if (e) e.stopPropagation();
+
+    var fields = [
+        "cf_notify_email",
+        "clar_notify_email",
+        "daily_stat_email"
+    ];
+
+    for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+
+        document.getElementById("NotificationsDialo_" + field).value =
+            document.getElementById("Ori_" + field).value;
+    }
+
+    var form = $("#NotificationsDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=10';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
+function saveInlineAdvanced(e)
+{
+    if (e) e.stopPropagation();
+
+    var fields = [
+        "dir_mode",
+        "dir_group",
+        "file_mode",
+        "file_group",
+        "allowed_languages",
+        "allowed_regions",
+        "login_template",
+        "login_template_options"
+    ];
+
+    for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+
+        var src = document.getElementById("Ori_" + field);
+        var dst = document.getElementById("AdvancedDialo_" + field);
+
+        if (src != null && dst != null) {
+            dst.value = src.value;
+        }
+    }
+
+    var form = $("#AdvancedDialogForm");
+
+    $.ajax({
+        url: form.attr("action"),
+        type: "POST",
+        data: form.serialize(),
+        dataType: "json",
+
+        success: function(data) {
+            if (data.retval != 0) {
+                alert(data.messages || "Failed to save settings");
+                return;
+            }
+
+            window.location.href =
+                self_url +
+                '?SID=' + SID +
+                '&action=' + current_action +
+                '&active=11';
+        },
+
+        error: function() {
+            alert("Failed to save settings");
+        }
+    });
+}
 function copyCheckbox(dst, src)
 {
     if (document.getElementById(src).value == "1") {
@@ -606,8 +1142,8 @@ function popupBasicDialog(e, skipField)
     document.getElementById("BasicDialo_keywords").value = document.getElementById("Ori_keywords").value;
     document.getElementById("BasicDialo_comment").value = document.getElementById("Ori_comment").value;
     $("#BasicDialo_default_locale").val(document.getElementById("Ori_default_locale").value);
-    document.getElementById("BasicDialo_personal").checked = false;
-    copyCheckbox("BasicDialo_personal", "Ori_personal");
+    document.getElementById("BasicDialo_personal").checked =
+        document.getElementById("Ori_personal").checked;
 
     if (typeof skipField !== 'undefined') {
         var dst = document.getElementById("BasicDialo_" + skipField);
@@ -830,7 +1366,141 @@ function np(e)
         <td><s:help topic="Contest.xml:@1" /></td>
     </s:tr>
 #%>
+<%#define INLINE_BOOL_ROW
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_@1" escape="no" />?</td>
 
+        <td>
+            <input type="checkbox"
+                   id="Ori_@1"
+                   value="1"<% if (cnts->@1) { %> checked="checked"<% } %> />
+        </td>
+
+        <td>
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineFlags(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:@1" />
+        </td>
+    </s:tr>
+#%>
+<%#define INLINE_HEADER_ROW
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_@1" escape="no" />:</td>
+
+        <td>
+            <s:textfield
+                id="Ori_@1"
+                name="@1"
+                size="48"
+                value="cnts->@1"
+                notset="yes" />
+        </td>
+
+        <td>
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_@1').val('');" />
+
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineHeaders(event);" />
+
+            [<s:a ac="cnts-edit-@2-page">Edit</s:a>]
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:@1" />
+        </td>
+    </s:tr>
+#%>
+<%#define INLINE_ATTR_ROW
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_@1" escape="no" />:</td>
+
+        <td>
+            <s:textfield
+                id="Ori_@1"
+                name="@1"
+                size="48"
+                value="cnts->@1"
+                notset="yes" />
+        </td>
+
+        <td>
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_@1').val('');" />
+
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineAttrs(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:@1" />
+        </td>
+    </s:tr>
+#%>
+<%#define INLINE_NOTIFICATION_ROW
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_@1" escape="no" />:</td>
+
+        <td>
+            <s:textfield
+                id="Ori_@1"
+                name="@1"
+                size="48"
+                value="cnts->@1"
+                notset="yes" />
+        </td>
+
+        <td>
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_@1').val('');" />
+
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineNotifications(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:@1" />
+        </td>
+    </s:tr>
+#%>
+<%#define INLINE_ADVANCED_ROW
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_@1" escape="no" />:</td>
+
+        <td>
+            <s:textfield
+                id="Ori_@1"
+                name="@1"
+                size="48"
+                value="cnts->@1"
+                notset="yes" />
+        </td>
+
+        <td>
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_@1').val('');" />
+
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineAdvanced(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:@1" />
+        </td>
+    </s:tr>
+#%>
 <%#define ORIG_TEXT_ROW_WITH_EDIT
     <s:tr attr="form_row_attrs[row ^= 1]">
         <td><s:v value="MSG_@1" escape="no" />:</td>
@@ -858,14 +1528,139 @@ function np(e)
     </s:tr>
 #%>
 
-<table border="0" onclick="popupBasicDialog();">
+<table border="0">
     <s:tr attr="form_row_attrs[row ^= 1]"><td>Contest ID:</td><td><s:v value="cnts->id" /></td><td>&nbsp;</td><td>&nbsp;</td></s:tr>
-    <%@expand ORIG_TEXT_ROW_NO_CLEAR "name" "48" %>
-    <%@expand ORIG_TEXT_ROW "name_en" "Basic" "48" %>
-    <%@expand ORIG_TEXT_ROW "main_url" "Basic" "48" %>
-    <%@expand ORIG_TEXT_ROW "keywords" "Basic" "48" %>
-    <%@expand ORIG_TEXT_ROW "comment" "Basic" "48" %>
-    <%@expand ORIG_TEXT_ROW "user_contest" "Basic" "48" %>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_name" escape="no" />:</td>
+        <td onclick="event.stopPropagation();">
+            <s:textfield
+                id="Ori_name"
+                name="name"
+                size="48"
+                value="cnts->name"
+                notset="yes" />
+        </td>
+        <td onclick="event.stopPropagation();">
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineName(event);" />
+        </td>
+
+        <td onclick="np(event);"><s:help topic="Contest.xml:name" /></td>
+    </s:tr>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_name_en" escape="no" />:</td>
+
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_name_en"
+            name="name_en"
+            size="48"
+            value="cnts->name_en"
+            notset="yes" />
+    </td>
+
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_name_en').val('');" />
+
+        <input type="button"
+               value="Save"
+               onclick="saveInlineName(event);" />
+    </td>
+
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:name_en" />
+    </td>
+</s:tr>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_main_url" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_main_url"
+            name="main_url"
+            size="48"
+            value="cnts->main_url"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_main_url').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineName(event);" />
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:main_url" />
+    </td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_keywords" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_keywords"
+            name="keywords"
+            size="48"
+            value="cnts->keywords"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_keywords').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineName(event);" />
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:keywords" />
+    </td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_comment" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_comment"
+            name="comment"
+            size="48"
+            value="cnts->comment"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_comment').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineName(event);" />
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:comment" />
+    </td>
+</s:tr>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_user_contest" escape="no" />:</td>
+
+    <td onclick="event.stopPropagation();">
+        <select id="Ori_user_contest"
+                data-current="<s:v value="cnts->user_contest" checkExpr="" />">
+        </select>
+    </td>
+
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Save"
+               onclick="saveInlineName(event);" />
+    </td>
+
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:user_contest" />
+    </td>
+</s:tr>
 <%
   if (cnts->default_locale && *cnts->default_locale) {
     int locale_id = l10n_parse_locale(cnts->default_locale);
@@ -878,93 +1673,429 @@ function np(e)
     }
   }
 %>
-    <%@expand ORIG_TEXT_ROW_NO_CLEAR "default_locale" "48" %>
-    <%@expand ORIG_BOOL_ROW "personal" %>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_default_locale" escape="no" />:</td>
+
+        <td onclick="event.stopPropagation();">
+            <% l10n_html_locale_select_3(
+                out_f,
+                "Ori_default_locale",
+                NULL,
+                "param",
+                NULL,
+                l10n_parse_locale(cnts->default_locale));
+            %>
+        </td>
+
+        <td onclick="event.stopPropagation();">
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineName(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:default_locale" />
+        </td>
+    </s:tr>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_personal" escape="no" />?</td>
+
+    <td onclick="event.stopPropagation();">
+        <input type="checkbox"
+               id="Ori_personal"
+               value="1"<% if (cnts->personal) { %> checked="checked"<% } %> />
+    </td>
+
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Save"
+               onclick="saveInlineName(event);" />
+    </td>
+
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:personal" />
+    </td>
+</s:tr>
 </table>
     </div>
 
     <h3>Registration settings</h3>
 
     <div>
-<table border="0" onclick="popupRegistrationDialog();">
+<table border="0">
 <% row = 1; %>
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_autoregister" escape="no" />:</td>
+
+    <td onclick="event.stopPropagation();">
+        <s:yesno
+            id="Ori_autoregister"
+            name="autoregister"
+            value="cnts->autoregister"
+            noLabel="Moderated registration"
+            yesLabel="Free registration" />
+    </td>
+
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Save"
+               onclick="saveInlineRegistration(event);" />
+    </td>
+
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:autoregister" />
+    </td>
+</s:tr>
     <s:tr attr="form_row_attrs[row ^= 1]">
-        <td><s:v value="MSG_autoregister" escape="no" />:</td>
-        <td><s:yesno disabled="disabled" id="Ori_autoregister" name="param" value="cnts->autoregister" noLabel="Moderated registration" yesLabel="Free registration" /></td>
-        <td>&nbsp;</td>
-        <td onclick="np(event);"><s:help topic="Contest.xml:autoregister" /></td>
+        <td><s:v value="MSG_reg_deadline" escape="no" />:</td>
+
+        <td onclick="event.stopPropagation();">
+            <% html_date_select_2(
+                out_f,
+                cnts->reg_deadline,
+                "Ori_reg_deadline",
+                "param",
+                NULL,
+                0,
+                0,
+                0);
+            %>
+        </td>
+
+        <td onclick="event.stopPropagation();">
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_reg_deadline_time').val(''); $('#Ori_reg_deadline_date').val('');" />
+
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineRegistration(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:reg_deadline" />
+        </td>
     </s:tr>
-    <%@expand ORIG_DATE_TIME_ROW "reg_deadline" "Registration" %>
-    <%@expand ORIG_TEXT_ROW "register_email" "Registration" "48" %>
-    <%@expand ORIG_TEXT_ROW "register_url" "Registration" "48" %>
-    <%@expand ORIG_TEXT_ROW "register_subject" "Registration" "48" %>
-    <%@expand ORIG_TEXT_ROW "register_subject_en" "Registration" "48" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "register_email_file" "Registration" "48" "register-email-file" %>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_register_email" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_register_email"
+            name="register_email"
+            size="48"
+            value="cnts->register_email"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_register_email').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineRegistration(event);" />
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:register_email" />
+    </td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_register_url" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_register_url"
+            name="register_url"
+            size="48"
+            value="cnts->register_url"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_register_url').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineRegistration(event);" />
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:register_url" />
+    </td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_register_subject" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_register_subject"
+            name="register_subject"
+            size="48"
+            value="cnts->register_subject"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_register_subject').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineRegistration(event);" />
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:register_subject" />
+    </td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_register_subject_en" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_register_subject_en"
+            name="register_subject_en"
+            size="48"
+            value="cnts->register_subject_en"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_register_subject_en').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineRegistration(event);" />
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:register_subject_en" />
+    </td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_register_email_file" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield
+            id="Ori_register_email_file"
+            name="register_email_file"
+            size="48"
+            value="cnts->register_email_file"
+            notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button"
+               value="Clear"
+               onclick="$('#Ori_register_email_file').val('');" />
+        <input type="button"
+               value="Save"
+               onclick="saveInlineRegistration(event);" />
+        [<s:a ac="cnts-edit-register-email-file-page">Edit</s:a>]
+    </td>
+    <td onclick="np(event);">
+        <s:help topic="Contest.xml:register_email_file" />
+    </td>
+</s:tr>
 </table>
     </div>
 
     <h3>Contest timing</h3>
 
     <div>
-<table border="0" onclick="popupTimingDialog();">
+<table border="0">
 <% row = 1; %>
-    <%@expand ORIG_DATE_TIME_ROW "sched_time" "Timing" %>
-    <%@expand ORIG_DATE_TIME_ROW "open_time" "Timing" %>
-    <%@expand ORIG_DATE_TIME_ROW "close_time" "Timing" %>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_sched_time" escape="no" />:</td>
+
+        <td onclick="event.stopPropagation();">
+            <% html_date_select_2(
+                out_f,
+                cnts->sched_time,
+                "Ori_sched_time",
+                "param",
+                NULL,
+                0,
+                0,
+                0);
+            %>
+        </td>
+
+        <td onclick="event.stopPropagation();">
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_sched_time_time').val(''); $('#Ori_sched_time_date').val('');" />
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineTiming(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:sched_time" />
+        </td>
+    </s:tr>
+
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_open_time" escape="no" />:</td>
+
+        <td onclick="event.stopPropagation();">
+            <% html_date_select_2(
+                out_f,
+                cnts->open_time,
+                "Ori_open_time",
+                "param",
+                NULL,
+                0,
+                0,
+                0);
+            %>
+        </td>
+
+        <td onclick="event.stopPropagation();">
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_open_time_time').val(''); $('#Ori_open_time_date').val('');" />
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineTiming(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:open_time" />
+        </td>
+    </s:tr>
+
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><s:v value="MSG_close_time" escape="no" />:</td>
+
+        <td onclick="event.stopPropagation();">
+            <% html_date_select_2(
+                out_f,
+                cnts->close_time,
+                "Ori_close_time",
+                "param",
+                NULL,
+                0,
+                0,
+                0);
+            %>
+        </td>
+
+        <td onclick="event.stopPropagation();">
+            <input type="button"
+                   value="Clear"
+                   onclick="$('#Ori_close_time_time').val(''); $('#Ori_close_time_date').val('');" />
+            <input type="button"
+                   value="Save"
+                   onclick="saveInlineTiming(event);" />
+        </td>
+
+        <td onclick="np(event);">
+            <s:help topic="Contest.xml:close_time" />
+        </td>
+    </s:tr>
 </table>
     </div>
 
     <h3>URLs</h3>
 
     <div>
-<table border="0" onclick="popupUrlDialog();">
+<table border="0">
 <% row = 1; %>
 
-    <%@expand ORIG_TEXT_ROW "team_url" "Url" "48" %>
-    <%@expand ORIG_TEXT_ROW "standings_url" "Url" "48" %>
-    <%@expand ORIG_TEXT_ROW "problems_url" "Url" "48" %>
-    <%@expand ORIG_TEXT_ROW "logo_url" "Url" "48" %>
-    <%@expand ORIG_TEXT_ROW "css_url" "Url" "48" %>
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_team_url" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield id="Ori_team_url" name="team_url" size="48" value="cnts->team_url" notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button" value="Clear" onclick="$('#Ori_team_url').val('');" />
+        <input type="button" value="Save" onclick="saveInlineUrls(event);" />
+    </td>
+    <td onclick="np(event);"><s:help topic="Contest.xml:team_url" /></td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_standings_url" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield id="Ori_standings_url" name="standings_url" size="48" value="cnts->standings_url" notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button" value="Clear" onclick="$('#Ori_standings_url').val('');" />
+        <input type="button" value="Save" onclick="saveInlineUrls(event);" />
+    </td>
+    <td onclick="np(event);"><s:help topic="Contest.xml:standings_url" /></td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_problems_url" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield id="Ori_problems_url" name="problems_url" size="48" value="cnts->problems_url" notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button" value="Clear" onclick="$('#Ori_problems_url').val('');" />
+        <input type="button" value="Save" onclick="saveInlineUrls(event);" />
+    </td>
+    <td onclick="np(event);"><s:help topic="Contest.xml:problems_url" /></td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_logo_url" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield id="Ori_logo_url" name="logo_url" size="48" value="cnts->logo_url" notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button" value="Clear" onclick="$('#Ori_logo_url').val('');" />
+        <input type="button" value="Save" onclick="saveInlineUrls(event);" />
+    </td>
+    <td onclick="np(event);"><s:help topic="Contest.xml:logo_url" /></td>
+</s:tr>
+
+<s:tr attr="form_row_attrs[row ^= 1]">
+    <td><s:v value="MSG_css_url" escape="no" />:</td>
+    <td onclick="event.stopPropagation();">
+        <s:textfield id="Ori_css_url" name="css_url" size="48" value="cnts->css_url" notset="yes" />
+    </td>
+    <td onclick="event.stopPropagation();">
+        <input type="button" value="Clear" onclick="$('#Ori_css_url').val('');" />
+        <input type="button" value="Save" onclick="saveInlineUrls(event);" />
+    </td>
+    <td onclick="np(event);"><s:help topic="Contest.xml:css_url" /></td>
+</s:tr>
 </table>
     </div>
 
     <h3>Contest flags</h3>
 
     <div>
-<table border="0" onclick="popupFlagsDialog();">
+<table border="0">
 <% row = 1; %>
 
-    <%@expand ORIG_BOOL_ROW "disable_team_password" %>
-    <%@expand ORIG_BOOL_ROW "force_password_change" %>
-    <%@expand ORIG_BOOL_ROW "simple_registration" %>
+    <%@expand INLINE_BOOL_ROW "disable_team_password" %>
+    <%@expand INLINE_BOOL_ROW "force_password_change" %>
+    <%@expand INLINE_BOOL_ROW "simple_registration" %>
 <%
   if (cnts->simple_registration) {
 %>
-    <%@expand ORIG_BOOL_ROW "send_passwd_email" %>
+    <%@expand INLINE_BOOL_ROW "send_passwd_email" %>
 <%
   } else {
 %><s:hidden id="Ori_send_passwd_email" name="send_passwd_email" value="cnts->send_passwd_email" check="no" /><%
   }
 %>
 
-    <%@expand ORIG_BOOL_ROW "clean_users" %>
-    <%@expand ORIG_BOOL_ROW "closed" %>
-    <%@expand ORIG_BOOL_ROW "invisible" %>
-    <%@expand ORIG_BOOL_ROW "disable_member_delete" %>
-    <%@expand ORIG_BOOL_ROW "assign_logins" %>
-    <%@expand ORIG_BOOL_ROW "force_registration" %>
-    <%@expand ORIG_BOOL_ROW "disable_name" %>
-    <%@expand ORIG_BOOL_ROW "enable_password_recovery" %>
-    <%@expand ORIG_BOOL_ROW "exam_mode" %>
-    <%@expand ORIG_BOOL_ROW "disable_password_change" %>
-    <%@expand ORIG_BOOL_ROW "disable_locale_change" %>
-    <%@expand ORIG_BOOL_ROW "allow_reg_data_edit" %>
-    <%@expand ORIG_BOOL_ROW "enable_user_telegram" %>
-    <%@expand ORIG_BOOL_ROW "enable_avatar" %>
-    <%@expand ORIG_BOOL_ROW "enable_local_pages" %>
-    <%@expand ORIG_BOOL_ROW "read_only_name" %>
-    <%@expand ORIG_BOOL_ROW "enable_oauth" %>
-    <%@expand ORIG_BOOL_ROW "enable_reminders" %>
+    <%@expand INLINE_BOOL_ROW "clean_users" %>
+    <%@expand INLINE_BOOL_ROW "closed" %>
+    <%@expand INLINE_BOOL_ROW "invisible" %>
+    <%@expand INLINE_BOOL_ROW "disable_member_delete" %>
+    <%@expand INLINE_BOOL_ROW "assign_logins" %>
+    <%@expand INLINE_BOOL_ROW "force_registration" %>
+    <%@expand INLINE_BOOL_ROW "disable_name" %>
+    <%@expand INLINE_BOOL_ROW "enable_password_recovery" %>
+    <%@expand INLINE_BOOL_ROW "exam_mode" %>
+    <%@expand INLINE_BOOL_ROW "disable_password_change" %>
+    <%@expand INLINE_BOOL_ROW "disable_locale_change" %>
+    <%@expand INLINE_BOOL_ROW "allow_reg_data_edit" %>
+    <%@expand INLINE_BOOL_ROW "enable_user_telegram" %>
+    <%@expand INLINE_BOOL_ROW "enable_avatar" %>
+    <%@expand INLINE_BOOL_ROW "enable_local_pages" %>
+    <%@expand INLINE_BOOL_ROW "read_only_name" %>
+    <%@expand INLINE_BOOL_ROW "enable_oauth" %>
+    <%@expand INLINE_BOOL_ROW "enable_reminders" %>
 </table>
     </div>
 
@@ -1217,14 +2348,14 @@ initial count = <s:v value="memb->init_count" />
     <h3>HTML headers and footers</h3>
 
     <div>
-<table border="0" onclick="popupHeadersDialog();">
+<table border="0">
 <% row = 1; %>
 
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "users_header_file" "Headers" "48" "users-header" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "users_footer_file" "Headers" "48" "users-footer" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "copyright_file" "Headers" "48" "copyright" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "welcome_file" "Headers" "48" "welcome" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "reg_welcome_file" "Headers" "48" "reg-welcome" %>
+    <%@expand INLINE_HEADER_ROW "users_header_file" "users-header" %>
+    <%@expand INLINE_HEADER_ROW "users_footer_file" "users-footer" %>
+    <%@expand INLINE_HEADER_ROW "copyright_file" "copyright" %>
+    <%@expand INLINE_HEADER_ROW "welcome_file" "welcome" %>
+    <%@expand INLINE_HEADER_ROW "reg_welcome_file" "reg-welcome" %>
 </table>
 
     </div>
@@ -1232,18 +2363,18 @@ initial count = <s:v value="memb->init_count" />
     <h3>Extra HTML attributes</h3>
 
     <div>
-<table border="0" onclick="popupAttrsDialog();">
+<table border="0">
 <% row = 1; %>
 
-    <%@expand ORIG_TEXT_ROW "users_head_style" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "users_par_style" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "users_table_style" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "users_verb_style" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "users_table_format" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "users_table_format_en" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "users_table_legend" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "users_table_legend_en" "Attrs" "48" %>
-    <%@expand ORIG_TEXT_ROW "user_name_comment" "Attrs" "48" %>
+    <%@expand INLINE_ATTR_ROW "users_head_style" %>
+    <%@expand INLINE_ATTR_ROW "users_par_style" %>
+    <%@expand INLINE_ATTR_ROW "users_table_style" %>
+    <%@expand INLINE_ATTR_ROW "users_verb_style" %>
+    <%@expand INLINE_ATTR_ROW "users_table_format" %>
+    <%@expand INLINE_ATTR_ROW "users_table_format_en" %>
+    <%@expand INLINE_ATTR_ROW "users_table_legend" %>
+    <%@expand INLINE_ATTR_ROW "users_table_legend_en" %>
+    <%@expand INLINE_ATTR_ROW "user_name_comment" %>
 </table>
 
     </div>
@@ -1251,12 +2382,12 @@ initial count = <s:v value="memb->init_count" />
     <h3>E-mail notifications</h3>
 
     <div>
-<table border="0" onclick="popupNotificationsDialog();">
+<table border="0">
 <% row = 1; %>
 
-    <%@expand ORIG_TEXT_ROW "cf_notify_email" "Notifications" "48" %>
-    <%@expand ORIG_TEXT_ROW "clar_notify_email" "Notifications" "48" %>
-    <%@expand ORIG_TEXT_ROW "daily_stat_email" "Notifications" "48" %>
+    <%@expand INLINE_NOTIFICATION_ROW "cf_notify_email" %>
+    <%@expand INLINE_NOTIFICATION_ROW "clar_notify_email" %>
+    <%@expand INLINE_NOTIFICATION_ROW "daily_stat_email" %>
 </table>
 
     </div>
@@ -1264,27 +2395,38 @@ initial count = <s:v value="memb->init_count" />
     <h3>Advanced settings</h3>
 
     <div>
-<table border="0" onclick="popupAdvancedDialog();">
+<table border="0">
 <% row = 1; %>
 
-    <%@expand ORIG_TEXT_ROW "dir_mode" "Advanced" "48" %>
-    <%@expand ORIG_TEXT_ROW "dir_group" "Advanced" "48" %>
-    <%@expand ORIG_TEXT_ROW "file_mode" "Advanced" "48" %>
-    <%@expand ORIG_TEXT_ROW "file_group" "Advanced" "48" %>
-    <%@expand ORIG_TEXT_ROW "allowed_languages" "Advanced" "48" %>
-    <%@expand ORIG_TEXT_ROW "allowed_regions" "Advanced" "48" %>
+    <%@expand INLINE_ADVANCED_ROW "dir_mode" %>
+    <%@expand INLINE_ADVANCED_ROW "dir_group" %>
+    <%@expand INLINE_ADVANCED_ROW "file_mode" %>
+    <%@expand INLINE_ADVANCED_ROW "file_group" %>
+    <%@expand INLINE_ADVANCED_ROW "allowed_languages" %>
+    <%@expand INLINE_ADVANCED_ROW "allowed_regions" %>
 <%
   if (cnts->assign_logins) {
 %>
-    <%@expand ORIG_TEXT_ROW "login_template" "Advanced" "48" %>
+    <%@expand INLINE_ADVANCED_ROW "login_template" %>
+    <%@expand INLINE_ADVANCED_ROW "login_template_options" %>
 <%
-  }
+  } else {
 %>
+    <tr style="display:none">
+        <td colspan="4">
+            <s:textfield
+                id="Ori_login_template"
+                name="login_template"
+                value="cnts->login_template"
+                notset="yes" />
 
-<%
-  if (cnts->assign_logins) {
-%>
-    <%@expand ORIG_TEXT_ROW "login_template_options" "Advanced" "48" %>
+            <s:textfield
+                id="Ori_login_template_options"
+                name="login_template_options"
+                value="cnts->login_template_options"
+                notset="yes" />
+        </td>
+    </tr>
 <%
   }
 %>
