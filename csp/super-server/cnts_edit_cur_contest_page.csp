@@ -116,687 +116,228 @@ static const unsigned char * const form_row_attrs[]=
 <%@include "cnts_edit_cur_top_menu.csp"
 %>
 
-<%#define EDIT_TEXT_ROW
-            <label for="@2Dialo_@1"><s:v value="MSG_@1" escape="no" />:</label>
-            <s:textfield size="@3" name="@1" id="@2Dialo_@1" value="" class="text ui-widget-content ui-corner-all" /><br/>
-#%>
+<style type="text/css">
+.contest-settings-section { width: 100%; }
+.contest-settings-section td:nth-child(1) { width: 34%; }
+.contest-settings-section td:nth-child(2) { width: 60%; }
+.contest-settings-section input[type="text"],
+.contest-settings-section select { box-sizing: border-box; max-width: 100%; }
+#ContestSettingsStatus { margin: 8px 0; white-space: pre-line; }
+#ContestSettingsStatus.is-error { color: #a40000; font-weight: bold; }
+.contest-file-editor { margin-left: 8px; white-space: nowrap; }
+.contest-setting-error { outline: 2px solid #c00; }
+</style>
 
-<%#define EDIT_BOOL_ROW
-            <input type="checkbox" name="@1" id="@2Dialo_@1" value="1" />
-            <label for="@2Dialo_@1"><s:v value="MSG_@1" escape="no" />?</label>
-            <br/>
-#%>
-
-<%#define EDIT_DATE_TIME_ROW
-            <label for="@2Dialo_@1_time"><s:v value="MSG_@1" escape="no" />:</label>
-            <input id="@2Dialo_@1_time" type="text" name="@1_time" class="time" size="6" class="text ui-widget-content ui-corner-all" />
-            <input id="@2Dialo_@1_date" type="text" name="@1_date" size="10" class="text ui-widget-content ui-corner-all" />
-            <br/>
-#%>
-
-<div id="BasicDialogDiv" title="Basic Contest Settings" style="overflow: auto;">
-    <s:form id="BasicDialogForm">
-        <s:hidden name="action" ac="cnts-save-basic-form" />
-        <fieldset>
-            <%@expand EDIT_TEXT_ROW "name" "Basic" "48" %>
-            <%@expand EDIT_TEXT_ROW "name_en" "Basic" "48" %>
-            <%@expand EDIT_TEXT_ROW "main_url" "Basic" "48" %>
-            <%@expand EDIT_TEXT_ROW "keywords" "Basic" "48" %>
-            <%@expand EDIT_TEXT_ROW "comment" "Basic" "48" %>
-            <label for="BasicDialo_user_contest"><s:v value="MSG_user_contest" escape="no" />:</label>
-            <select id="BasicDialo_user_contest" name="user_contest"></select><br/>
-            <label for="BasicDialo_default_locale"><s:v value="MSG_default_locale" escape="no" />:</label>
-<% l10n_html_locale_select_3(out_f, "BasicDialo_default_locale", NULL, "default_locale", NULL, -1); %>
-            <br/>
-            <%@expand EDIT_BOOL_ROW "personal" "Basic" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="FlagsDialogDiv" title="Contest Options" style="overflow: auto;">
-    <s:form id="FlagsDialogForm">
-        <s:hidden name="action" ac="cnts-save-flags-form" />
-        <fieldset>
-            <%@expand EDIT_BOOL_ROW "closed" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "disable_team_password" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "force_password_change" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "simple_registration" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "send_passwd_email" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "invisible" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "clean_users" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "disable_member_delete" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "assign_logins" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "force_registration" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "disable_name" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "enable_password_recovery" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "exam_mode" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "disable_password_change" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "disable_locale_change" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "allow_reg_data_edit" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "enable_user_telegram" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "enable_avatar" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "enable_local_pages" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "read_only_name" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "enable_oauth" "Flags" %>
-            <%@expand EDIT_BOOL_ROW "enable_reminders" "Flags" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="RegistrationDialogDiv" title="Registration Options" style="overflow: auto;">
-    <s:form id="RegistrationDialogForm">
-        <s:hidden name="action" ac="cnts-save-registration-form" />
-        <fieldset>
-            <label for="RegistrationDialo_autoregister"><s:v value="MSG_autoregister" escape="no" />:</label>
-            <s:yesno id="RegistrationDialo_autoregister" name="autoregister" noLabel="Moderated registration" yesLabel="Free registration" />
-            <br/>
-
-            <%@expand EDIT_DATE_TIME_ROW "reg_deadline" "Registration"  %>
-            <%@expand EDIT_TEXT_ROW "register_email" "Registration" "48" %>
-            <%@expand EDIT_TEXT_ROW "register_url" "Registration" "48" %>
-            <%@expand EDIT_TEXT_ROW "register_subject" "Registration" "48" %>
-            <%@expand EDIT_TEXT_ROW "register_subject_en" "Registration" "48" %>
-            <%@expand EDIT_TEXT_ROW "register_email_file" "Registration" "48" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="TimingDialogDiv" title="Contest Timing" style="overflow: auto;">
-    <s:form id="TimingDialogForm">
-        <s:hidden name="action" ac="cnts-save-timing-form" />
-        <fieldset>
-            <%@expand EDIT_DATE_TIME_ROW "sched_time" "Timing" %>
-            <%@expand EDIT_DATE_TIME_ROW "open_time" "Timing" %>
-            <%@expand EDIT_DATE_TIME_ROW "close_time" "Timing" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="UrlDialogDiv" title="Contest URLs" style="overflow: auto;">
-    <s:form id="UrlDialogForm">
-        <s:hidden name="action" ac="cnts-save-urls-form" />
-        <fieldset>
-            <%@expand EDIT_TEXT_ROW "team_url" "Url" "48" %>
-            <%@expand EDIT_TEXT_ROW "standings_url" "Url" "48" %>
-            <%@expand EDIT_TEXT_ROW "problems_url" "Url" "48" %>
-            <%@expand EDIT_TEXT_ROW "logo_url" "Url" "48" %>
-            <%@expand EDIT_TEXT_ROW "css_url" "Url" "48" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="HeadersDialogDiv" title="Header/Footer Files" style="overflow: auto;">
-    <s:form id="HeadersDialogForm">
-        <s:hidden name="action" ac="cnts-save-headers-form" />
-        <fieldset>
-            <%@expand EDIT_TEXT_ROW "users_header_file" "Headers" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_footer_file" "Headers" "48" %>
-            <%@expand EDIT_TEXT_ROW "copyright_file" "Headers" "48" %>
-            <%@expand EDIT_TEXT_ROW "welcome_file" "Headers" "48" %>
-            <%@expand EDIT_TEXT_ROW "reg_welcome_file" "Headers" "48" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="AttrsDialogDiv" title="HTML Attributes" style="overflow: auto;">
-    <s:form id="AttrsDialogForm">
-        <s:hidden name="action" ac="cnts-save-attrs-form" />
-        <fieldset>
-            <%@expand EDIT_TEXT_ROW "users_head_style" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_par_style" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_table_style" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_verb_style" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_table_format" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_table_format_en" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_table_legend" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "users_table_legend_en" "Attrs" "48" %>
-            <%@expand EDIT_TEXT_ROW "user_name_comment" "Attrs" "48" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="NotificationsDialogDiv" title="Notifications" style="overflow: auto;">
-    <s:form id="NotificationsDialogForm">
-        <s:hidden name="action" ac="cnts-save-notifications-form" />
-        <fieldset>
-            <%@expand EDIT_TEXT_ROW "cf_notify_email" "Notifications" "48" %>
-            <%@expand EDIT_TEXT_ROW "clar_notify_email" "Notifications" "48" %>
-            <%@expand EDIT_TEXT_ROW "daily_stat_email" "Notifications" "48" %>
-        </fieldset>
-    </s:form>
-</div>
-
-<div id="AdvancedDialogDiv" title="Advanced" style="overflow: auto;">
-    <s:form id="AdvancedDialogForm">
-        <s:hidden name="action" ac="cnts-save-advanced-form" />
-        <fieldset>
-            <%@expand EDIT_TEXT_ROW "dir_mode" "Advanced" "48" %>
-            <%@expand EDIT_TEXT_ROW "dir_group" "Advanced" "48" %>
-            <%@expand EDIT_TEXT_ROW "file_mode" "Advanced" "48" %>
-            <%@expand EDIT_TEXT_ROW "file_group" "Advanced" "48" %>
-            <%@expand EDIT_TEXT_ROW "allowed_languages" "Advanced" "48" %>
-            <%@expand EDIT_TEXT_ROW "allowed_regions" "Advanced" "48" %>
-            <%@expand EDIT_TEXT_ROW "login_template" "Advanced" "48" %>
-            <%@expand EDIT_TEXT_ROW "login_template_options" "Advanced" "48" %>
-        </fieldset>
-    </s:form>
-</div>
+<s:form id="ContestSettingsForm">
+    <s:hidden name="action" ac="cnts-save-contest-form" />
+</s:form>
 
 <script type="text/javascript">
+var contestSettingsDirty = false;
+var contestSettingsSaving = false;
+var contestSettingsTimer = null;
+var contestSettingsSavedData = null;
+var contestSettingsContinue = null;
+var contestSettingsDiscard = false;
+var contestSettingsActivating = false;
+
+function contestSettingsControls()
+{
+    return $(".contest-settings-section").find(":input[name]").not(":button");
+}
+
+function serializeContestSettings()
+{
+    var formData = $("#ContestSettingsForm").serialize();
+    var settingsData = contestSettingsControls().serialize();
+    return formData + (formData && settingsData ? "&" : "") + settingsData;
+}
+
+function setContestSettingsStatus(message, state)
+{
+    $("#ContestSettingsStatus").toggleClass("is-error", state === "error")
+        .text(String(message).replace(/<br\s*\/?\s*>/gi, "\n"));
+}
+
+function markContestSettingsDirty()
+{
+    contestSettingsDirty = serializeContestSettings() !== contestSettingsSavedData;
+    clearTimeout(contestSettingsTimer);
+    if (contestSettingsDirty) {
+        contestSettingsTimer = setTimeout(saveContestSettings, 700);
+    }
+}
+
+function activateContestSettings(index)
+{
+    contestSettingsActivating = true;
+    $("#ContestAccordion").accordion("option", "active", index);
+    contestSettingsActivating = false;
+}
+
+function continueContestSettings()
+{
+    var continuation = contestSettingsContinue;
+    contestSettingsContinue = null;
+    if (continuation) continuation();
+}
+
+// Serialize requests: a response must never mark newer input as saved.
+function saveContestSettings()
+{
+    clearTimeout(contestSettingsTimer);
+    if (contestSettingsSaving) return;
+    if (contestSettingsDiscard) {
+        contestSettingsDirty = false;
+        continueContestSettings();
+        return;
+    }
+    var snapshot = serializeContestSettings();
+    contestSettingsDirty = snapshot !== contestSettingsSavedData;
+    if (!contestSettingsDirty) {
+        continueContestSettings();
+        return;
+    }
+    contestSettingsSaving = true;
+    $(".contest-setting-error").removeClass("contest-setting-error");
+    setContestSettingsStatus("Saving to the editing session...", "");
+    var succeeded = false;
+    $.ajax({
+        url: $("#ContestSettingsForm").attr("action"),
+        type: "POST",
+        dataType: "json",
+        data: snapshot,
+        timeout: 15000,
+        success: function(data) {
+            if (!data || data.retval !== 0) {
+                setContestSettingsStatus(data && data.messages ? data.messages : "Could not save settings. Edit the highlighted field or try leaving this section again.", "error");
+                if (data && data.active >= 0) activateContestSettings(data.active);
+                if (data && data.error_field) {
+                    $("#ContestSetting_" + data.error_field).addClass("contest-setting-error").focus();
+                }
+                return;
+            }
+            succeeded = true;
+            contestSettingsSavedData = snapshot;
+            contestSettingsDirty = serializeContestSettings() !== snapshot;
+            setContestSettingsStatus("Changes are saved automatically to the editing session. Use COMMIT changes! to apply them.", "");
+        },
+        error: function(jqXHR, textStatus) {
+            var message;
+            if (textStatus === "parsererror") {
+                message = "The server returned an unexpected response. Your input is still on this page. The editing session may have expired; check the server log before reloading.";
+            } else if (jqXHR && jqXHR.status) {
+                message = "Could not save settings (HTTP " + jqXHR.status + "). Your input is still on this page. Try leaving this section again.";
+            } else {
+                message = "Could not reach the server to save settings. Your input is still on this page. Check the connection and try leaving this section again.";
+            }
+            setContestSettingsStatus(message, "error");
+        },
+        complete: function() {
+            contestSettingsSaving = false;
+            if (succeeded || contestSettingsDiscard) {
+                saveContestSettings();
+            } else {
+                clearTimeout(contestSettingsTimer);
+                contestSettingsContinue = null;
+                if (serializeContestSettings() !== snapshot) {
+                    contestSettingsTimer = setTimeout(saveContestSettings, 700);
+                }
+            }
+        }
+    });
+}
+
+function afterContestSettingsSaved(continuation, discard)
+{
+    // Keep the first navigation intent while its save is in progress.
+    if (contestSettingsContinue) return;
+    contestSettingsContinue = continuation;
+    contestSettingsDiscard = !!discard;
+    saveContestSettings();
+}
+
 $(function() {
-    $('#ContestAccordion').accordion({ heightStyle: "content" <% if (active > 0) { %>, active: <s:v value="active" /><% } %> });
-    dialog = $("#BasicDialogDiv").dialog({
-        autoOpen: false,
-        height: 300,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#BasicDialogForm").serialize();
-                var formURL = $("#BasicDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=0';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                dialog.dialog("close");
+    $("#ContestAccordion").accordion({
+        beforeActivate: function(event, ui) {
+            if (contestSettingsActivating) return;
+            if (contestSettingsDirty || contestSettingsSaving) {
+                event.preventDefault();
+                var index = ui.newHeader.length ? $("#ContestAccordion > h3").index(ui.newHeader) : false;
+                afterContestSettingsSaved(function() { activateContestSettings(index); });
             }
         },
-        close : function() {
-        }
+        heightStyle: "content"<% if (active > 0) { %>,
+        active: <s:v value="active" /><% } %>
     });
-    flagsDialog = $("#FlagsDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#FlagsDialogForm").serialize();
-                var formURL = $("#FlagsDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=4';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                flagsDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
-    registrationDialog = $("#RegistrationDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#RegistrationDialogForm").serialize();
-                var formURL = $("#RegistrationDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=1';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                registrationDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
-    $('#RegistrationDialo_reg_deadline_time').timepicker({ 'timeFormat': 'H:i', 'step': 30 });
-    $('#RegistrationDialo_reg_deadline_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
 
-    timingDialog = $("#TimingDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#TimingDialogForm").serialize();
-                var formURL = $("#TimingDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=2';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                timingDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
-    $('#TimingDialo_sched_time_time').timepicker({ 'timeFormat': 'H:i', 'step': 30 });
-    $('#TimingDialo_sched_time_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
-    $('#TimingDialo_open_time_time').timepicker({ 'timeFormat': 'H:i', 'step': 30 });
-    $('#TimingDialo_open_time_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
-    $('#TimingDialo_close_time_time').timepicker({ 'timeFormat': 'H:i', 'step': 30 });
-    $('#TimingDialo_close_time_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
+    $("#ContestSetting_reg_deadline_time").timepicker({ "timeFormat": "H:i", "step": 30 });
+    $("#ContestSetting_reg_deadline_date").datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
+    $("#ContestSetting_sched_time_time").timepicker({ "timeFormat": "H:i", "step": 30 });
+    $("#ContestSetting_sched_time_date").datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
+    $("#ContestSetting_open_time_time").timepicker({ "timeFormat": "H:i", "step": 30 });
+    $("#ContestSetting_open_time_date").datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
+    $("#ContestSetting_close_time_time").timepicker({ "timeFormat": "H:i", "step": 30 });
+    $("#ContestSetting_close_time_date").datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
 
-    urlDialog = $("#UrlDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#UrlDialogForm").serialize();
-                var formURL = $("#UrlDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=3';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                urlDialog.dialog("close");
+    var userContest = $("#ContestSetting_user_contest");
+    $.ajax({
+        url: self_url,
+        data: { SID: SID, action: "<s:ac ac="get-contest-list" />" },
+        dataType: "text",
+        success: function(data) {
+            // Do not replace a selection that the user changed while loading.
+            var selection = userContest.val();
+            userContest.html(data).val(selection);
+            if (userContest.val() === null) {
+                userContest.append($("<option>").val(selection).text(selection)).val(selection);
             }
-        },
-        close : function() {
         }
     });
 
-    headersDialog = $("#HeadersDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#HeadersDialogForm").serialize();
-                var formURL = $("#HeadersDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=8';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                headersDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
+    contestSettingsSavedData = serializeContestSettings();
+    contestSettingsControls().on("input change", markContestSettingsDirty);
+    contestSettingsControls().on("focusout", function() {
+        if (contestSettingsDirty) saveContestSettings();
     });
 
-    attrsDialog = $("#AttrsDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#AttrsDialogForm").serialize();
-                var formURL = $("#AttrsDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=9';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                attrsDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+    // Capture navigation before other handlers can leave the editing page.
+    document.addEventListener("click", function(event) {
+        var link = $(event.target).closest("a[href]")[0];
+        if (!link || link.origin !== window.location.origin ||
+            link.pathname !== window.location.pathname ||
+            link.getAttribute("href").charAt(0) === "#" ||
+            link.target === "_blank" || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button) return;
+        if (!contestSettingsDirty && !contestSettingsSaving) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        afterContestSettingsSaved(function() { window.location.href = link.href; });
+    }, true);
 
-    notificationsDialog = $("#NotificationsDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#NotificationsDialogForm").serialize();
-                var formURL = $("#NotificationsDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=10';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                notificationsDialog.dialog("close");
+    // Preserve the clicked action (especially Commit) when resuming a form.
+    var clickedSubmit = null;
+    $(document).on("click", ":submit", function() { clickedSubmit = this; });
+    document.addEventListener("submit", function(event) {
+        var form = event.target;
+        if (form.id === "ContestSettingsForm") { event.preventDefault(); return; }
+        var button = event.submitter || clickedSubmit;
+        clickedSubmit = null;
+        if (button && button.form !== form) button = null;
+        var discard = button && button.name === "action_<s:ac ac="cnts-forget" />";
+        if (!contestSettingsDirty && !contestSettingsSaving) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        afterContestSettingsSaved(function() {
+            if (button && button.name) {
+                $("<input>").attr({ type: "hidden", name: button.name, value: button.value }).appendTo(form);
             }
-        },
-        close : function() {
-        }
-    });
-
-    advancedDialog = $("#AdvancedDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#AdvancedDialogForm").serialize();
-                var formURL = $("#AdvancedDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        //document.location.reload(true);
-                        window.location.href = self_url + '?SID=' + SID + '&action=' + current_action + '&active=11';
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                advancedDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
+            HTMLFormElement.prototype.submit.call(form);
+        }, discard);
+    }, true);
+    $(window).on("beforeunload", function() {
+        if (contestSettingsDirty || contestSettingsSaving) return "Settings have not yet been saved to the editing session.";
     });
 });
-
-function copyCheckbox(dst, src)
-{
-    if (document.getElementById(src).value == "1") {
-        document.getElementById(dst).checked = true;
-    }
-}
-
-function popupBasicDialog(e, skipField)
-{
-    var selWidget=document.getElementById("BasicDialo_user_contest");
-    if (selWidget != null) {
-        if (selWidget.options.length == 0) {
-            jQuery.ajax({
-                url : '<s:v value="phr->self_url" escape="false" />',
-                data : {
-                    SID : '<s:v value="phr->session_id" />',
-                    action : '<s:ac ac="get-contest-list" />'
-                },
-                dataType : "text",
-                success : function(data) {
-                    $("#BasicDialo_user_contest").html(data);
-                    $("#BasicDialo_user_contest").val(document.getElementById("Ori_user_contest").value);
-                }
-            });
-        } else {
-            $("#BasicDialo_user_contest").val(document.getElementById("Ori_user_contest").value);
-        }
-    }
-
-    document.getElementById("BasicDialo_name").value = document.getElementById("Ori_name").value;
-    document.getElementById("BasicDialo_name_en").value = document.getElementById("Ori_name_en").value;
-    document.getElementById("BasicDialo_main_url").value = document.getElementById("Ori_main_url").value;
-    document.getElementById("BasicDialo_keywords").value = document.getElementById("Ori_keywords").value;
-    document.getElementById("BasicDialo_comment").value = document.getElementById("Ori_comment").value;
-    $("#BasicDialo_default_locale").val(document.getElementById("Ori_default_locale").value);
-    document.getElementById("BasicDialo_personal").checked = false;
-    copyCheckbox("BasicDialo_personal", "Ori_personal");
-
-    if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("BasicDialo_" + skipField);
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#BasicDialogDiv").dialog('open');
-}
-
-function popupFlagsDialog()
-{
-    copyCheckbox("FlagsDialo_closed", "Ori_closed");
-    copyCheckbox("FlagsDialo_disable_team_password", "Ori_disable_team_password");
-    copyCheckbox("FlagsDialo_force_password_change", "Ori_force_password_change");
-    copyCheckbox("FlagsDialo_simple_registration", "Ori_simple_registration");
-    copyCheckbox("FlagsDialo_send_passwd_email", "Ori_send_passwd_email");
-    copyCheckbox("FlagsDialo_invisible", "Ori_invisible");
-    copyCheckbox("FlagsDialo_clean_users", "Ori_clean_users");
-    copyCheckbox("FlagsDialo_disable_member_delete", "Ori_disable_member_delete");
-    copyCheckbox("FlagsDialo_assign_logins", "Ori_assign_logins");
-    copyCheckbox("FlagsDialo_force_registration", "Ori_force_registration");
-    copyCheckbox("FlagsDialo_disable_name", "Ori_disable_name");
-    copyCheckbox("FlagsDialo_enable_password_recovery", "Ori_enable_password_recovery");
-    copyCheckbox("FlagsDialo_exam_mode", "Ori_exam_mode");
-    copyCheckbox("FlagsDialo_disable_password_change", "Ori_disable_password_change");
-    copyCheckbox("FlagsDialo_disable_locale_change", "Ori_disable_locale_change");
-    copyCheckbox("FlagsDialo_allow_reg_data_edit", "Ori_allow_reg_data_edit");
-    copyCheckbox("FlagsDialo_enable_user_telegram", "Ori_enable_user_telegram");
-    copyCheckbox("FlagsDialo_enable_avatar", "Ori_enable_avatar");
-    copyCheckbox("FlagsDialo_enable_local_pages", "Ori_enable_local_pages");
-    copyCheckbox("FlagsDialo_read_only_name", "Ori_read_only_name");
-    copyCheckbox("FlagsDialo_enable_oauth", "Ori_enable_oauth");
-    copyCheckbox("FlagsDialo_enable_reminders", "Ori_enable_reminders");
-
-    $("#FlagsDialogDiv").dialog('open');
-}
-
-function popupRegistrationDialog(e, skipField)
-{
-    $("#RegistrationDialo_autoregister").val(document.getElementById("Ori_autoregister").value);
-    document.getElementById("RegistrationDialo_reg_deadline_time").value = document.getElementById("Ori_reg_deadline_time").value;
-    document.getElementById("RegistrationDialo_reg_deadline_date").value = document.getElementById("Ori_reg_deadline_date").value;
-    document.getElementById("RegistrationDialo_register_email").value = document.getElementById("Ori_register_email").value;
-    document.getElementById("RegistrationDialo_register_url").value = document.getElementById("Ori_register_url").value;
-    document.getElementById("RegistrationDialo_register_subject").value = document.getElementById("Ori_register_subject").value;
-    document.getElementById("RegistrationDialo_register_subject_en").value = document.getElementById("Ori_register_subject_en").value;
-    document.getElementById("RegistrationDialo_register_email_file").value = document.getElementById("Ori_register_email_file").value;
-
-    if (skipField == "RegDeadline") {
-        document.getElementById("RegistrationDialo_reg_deadline_time").value = "";
-        document.getElementById("RegistrationDialo_reg_deadline_date").value = "";
-    } else if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("RegistrationDialog" + skipField);
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#RegistrationDialogDiv").dialog('open');
-}
-
-function popupTimingDialog(e, skipField)
-{
-    var fields = [ "sched_time", "open_time", "close_time" ];
-    for (var i in fields) {
-        var dst = document.getElementById("TimingDialo_" + fields[i] + "_time");
-        var src = document.getElementById("Ori_" + fields[i] + "_time");
-        if (dst != null && src != null) {
-            dst.value = src.value;
-        }
-        dst = document.getElementById("TimingDialo_" + fields[i] + "_date");
-        src = document.getElementById("Ori_" + fields[i] + "_date");
-        if (dst != null && src != null) {
-            dst.value = src.value;
-        }
-    }
-    if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("TimingDialo_" + skipField + "_time");
-        if (dst != null) {
-            dst.value = "";
-        }
-        dst = document.getElementById("TimingDialo_" + skipField + "_date");
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#TimingDialogDiv").dialog('open');
-}
-
-function popupUrlDialog(e, skipField)
-{
-    var fields = ["team_url", "standings_url", "problems_url", "logo_url", "css_url"];
-    for (var i in fields) {
-        document.getElementById("UrlDialo_" + fields[i]).value = document.getElementById("Ori_" + fields[i]).value;
-    }
-    if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("UrlDialo_" + skipField);
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#UrlDialogDiv").dialog('open');
-}
-
-function popupHeadersDialog(e, skipField)
-{
-    var fields = ["users_header_file", "users_footer_file", "copyright_file", "welcome_file", "reg_welcome_file"];
-    for (var i in fields) {
-        document.getElementById("HeadersDialo_" + fields[i]).value = document.getElementById("Ori_" + fields[i]).value;
-    }
-    if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("HeadersDialo_" + skipField);
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#HeadersDialogDiv").dialog('open');
-}
-
-function popupAttrsDialog(e, skipField)
-{
-    var fields = [ "users_head_style", "users_par_style", "users_table_style", "users_verb_style", "users_table_format",
-                   "users_table_format_en", "users_table_legend", "users_table_legend_en", "user_name_comment" ];
-    for (var i in fields) {
-        document.getElementById("AttrsDialo_" + fields[i]).value = document.getElementById("Ori_" + fields[i]).value;
-    }
-    if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("AttrsDialo_" + skipField);
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#AttrsDialogDiv").dialog('open');
-}
-
-function popupNotificationsDialog(e, skipField)
-{
-    var fields = [ "cf_notify_email", "clar_notify_email", "daily_stat_email" ];
-    for (var i in fields) {
-        document.getElementById("NotificationsDialo_" + fields[i]).value = document.getElementById("Ori_" + fields[i]).value;
-    }
-    if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("NotificationsDialo_" + skipField);
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#NotificationsDialogDiv").dialog('open');
-}
-
-function popupAdvancedDialog(e, skipField)
-{
-    var fields = [ "dir_mode", "dir_group", "file_mode", "file_group", "allowed_languages", "allowed_regions", "login_template", "login_template_options" ];
-    for (var i in fields) {
-        var dst = document.getElementById("AdvancedDialo_" + fields[i]);
-        var src = document.getElementById("Ori_" + fields[i]);
-        if (dst != null && src != null) {
-            dst.value = src.value;
-        }
-    }
-    if (typeof skipField !== 'undefined') {
-        var dst = document.getElementById("AdvancedDialo_" + skipField);
-        if (dst != null) {
-            dst.value = "";
-        }
-    }
-
-    if (e) e.stopPropagation();
-    $("#AdvancedDialogDiv").dialog('open');
-}
-
-function np(e)
-{
-    if (e) e.stopPropagation();
-}
 </script>
 
 <div id="ContestAccordion">
@@ -806,37 +347,33 @@ function np(e)
 
 <%#define ORIG_TEXT_ROW
     <s:tr attr="form_row_attrs[row ^= 1]">
-        <td><s:v value="MSG_@1" escape="no" />:</td>
-        <td><s:textfield id="Ori_@1" readonly="readonly" size="@3" name="param" value="cnts->@1" notset="yes" /></td>
-        <td><input type="button" onclick="popup@2Dialog(event, '@1');" value="Clear" /></td>
-        <td onclick="np(event);"><s:help topic="Contest.xml:@1" /></td>
+        <td><label for="ContestSetting_@1"><s:v value="MSG_@1" escape="no" />:</label></td>
+        <td><s:textfield id="ContestSetting_@1" size="@3" name="@1" value="cnts->@1" notset="yes" /></td>
+        <td><s:help topic="Contest.xml:@1" /></td>
     </s:tr>
 #%>
 
 <%#define ORIG_TEXT_ROW_NO_CLEAR
     <s:tr attr="form_row_attrs[row ^= 1]">
-        <td><s:v value="MSG_@1" escape="no" />:</td>
-        <td><s:textfield id="Ori_@1" readonly="readonly" size="@2" name="param" value="cnts->@1" notset="yes" /></td>
-        <td>&nbsp;</td>
-        <td onclick="np(event);"><s:help topic="Contest.xml:@1" /></td>
+        <td><label for="ContestSetting_@1"><s:v value="MSG_@1" escape="no" />:</label></td>
+        <td><s:textfield id="ContestSetting_@1" size="@2" name="@1" value="cnts->@1" notset="yes" /></td>
+        <td><s:help topic="Contest.xml:@1" /></td>
     </s:tr>
 #%>
 
 <%#define ORIG_BOOL_ROW
     <s:tr attr="form_row_attrs[row ^= 1]">
-        <td><s:v value="MSG_@1" escape="no" />?</td>
-        <td><s:yesno id="Ori_@1" disabled="disabled" name="param" value="cnts->@1" /></td>
-        <td>&nbsp;</td>
+        <td><label for="ContestSetting_@1"><s:v value="MSG_@1" escape="no" />?</label></td>
+        <td><input type="checkbox" id="ContestSetting_@1" name="@1" value="1"<% if (cnts->@1) { %> checked="checked"<% } %> /></td>
         <td><s:help topic="Contest.xml:@1" /></td>
     </s:tr>
 #%>
 
 <%#define ORIG_TEXT_ROW_WITH_EDIT
     <s:tr attr="form_row_attrs[row ^= 1]">
-        <td><s:v value="MSG_@1" escape="no" />:</td>
-        <td><s:textfield id="Ori_@1" readonly="readonly" size="@3" name="param" value="cnts->@1" notset="yes" /></td>
-        <td onclick="np(event);"><input type="button" onclick="popup@2Dialog(event, '@1');" value="Clear" />[<s:a ac="cnts-edit-@4-page">Edit</s:a>]</td>
-        <td onclick="np(event);"><s:help topic="Contest.xml:@1" /></td>
+        <td><label for="ContestSetting_@1"><s:v value="MSG_@1" escape="no" />:</label></td>
+        <td><s:textfield id="ContestSetting_@1" size="@3" name="@1" value="cnts->@1" notset="yes" /> <s:a class="contest-file-editor" ac="cnts-edit-@4-page">@5</s:a></td>
+        <td><s:help topic="Contest.xml:@1" /></td>
     </s:tr>
 #%>
 
@@ -851,34 +388,29 @@ function np(e)
 
 <%#define ORIG_DATE_TIME_ROW
     <s:tr attr="form_row_attrs[row ^= 1]">
-        <td><s:v value="MSG_@1" escape="no" />:</td>
-        <td><% html_date_select_2(out_f, cnts->@1, "Ori_@1", "param", NULL, 1, 0, 0); %></td>
-        <td><input type="button" onclick="popup@2Dialog(event, '@1');" value="Clear" /></td>
-        <td onclick="np(event);"><s:help topic="Contest.xml:@1" /></td>
+        <td><label for="ContestSetting_@1_date"><s:v value="MSG_@1" escape="no" />:</label></td>
+        <td><% html_date_select_2(out_f, cnts->@1, "ContestSetting_@1", "@1", NULL, 0, 0, 0); %></td>
+        <td><s:help topic="Contest.xml:@1" /></td>
     </s:tr>
 #%>
 
-<table border="0" onclick="popupBasicDialog();">
-    <s:tr attr="form_row_attrs[row ^= 1]"><td>Contest ID:</td><td><s:v value="cnts->id" /></td><td>&nbsp;</td><td>&nbsp;</td></s:tr>
+<table border="0" class="contest-settings-section" data-section="basic">
+    <s:tr attr="form_row_attrs[row ^= 1]"><td>Contest ID:</td><td><s:v value="cnts->id" /></td><td>&nbsp;</td></s:tr>
     <%@expand ORIG_TEXT_ROW_NO_CLEAR "name" "48" %>
     <%@expand ORIG_TEXT_ROW "name_en" "Basic" "48" %>
     <%@expand ORIG_TEXT_ROW "main_url" "Basic" "48" %>
     <%@expand ORIG_TEXT_ROW "keywords" "Basic" "48" %>
     <%@expand ORIG_TEXT_ROW "comment" "Basic" "48" %>
-    <%@expand ORIG_TEXT_ROW "user_contest" "Basic" "48" %>
-<%
-  if (cnts->default_locale && *cnts->default_locale) {
-    int locale_id = l10n_parse_locale(cnts->default_locale);
-    if (locale_id >= 0) {
-      const unsigned char *str = l10n_unparse_locale(locale_id);
-      xfree(phr->ss->edited_cnts->default_locale); phr->ss->edited_cnts->default_locale = NULL;
-      if (str) phr->ss->edited_cnts->default_locale = xstrdup(str);
-    } else {
-      xfree(phr->ss->edited_cnts->default_locale); phr->ss->edited_cnts->default_locale = NULL;
-    }
-  }
-%>
-    <%@expand ORIG_TEXT_ROW_NO_CLEAR "default_locale" "48" %>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><label for="ContestSetting_user_contest"><s:v value="MSG_user_contest" escape="no" />:</label></td>
+        <td><select id="ContestSetting_user_contest" name="user_contest"><% fprintf(out_f, "<option value=\"%d\" selected=\"selected\">%d</option>", cnts->user_contest ? atoi((const char *) cnts->user_contest) : 0, cnts->user_contest ? atoi((const char *) cnts->user_contest) : 0); %></select></td>
+        <td><s:help topic="Contest.xml:user_contest" /></td>
+    </s:tr>
+    <s:tr attr="form_row_attrs[row ^= 1]">
+        <td><label for="ContestSetting_default_locale"><s:v value="MSG_default_locale" escape="no" />:</label></td>
+        <td><% l10n_html_locale_select_3(out_f, "ContestSetting_default_locale", NULL, "default_locale", NULL, cnts->default_locale ? l10n_parse_locale(cnts->default_locale) : -1); %></td>
+        <td><s:help topic="Contest.xml:default_locale" /></td>
+    </s:tr>
     <%@expand ORIG_BOOL_ROW "personal" %>
 </table>
     </div>
@@ -886,27 +418,26 @@ function np(e)
     <h3>Registration settings</h3>
 
     <div>
-<table border="0" onclick="popupRegistrationDialog();">
+<table border="0" class="contest-settings-section" data-section="registration">
 <% row = 1; %>
     <s:tr attr="form_row_attrs[row ^= 1]">
         <td><s:v value="MSG_autoregister" escape="no" />:</td>
-        <td><s:yesno disabled="disabled" id="Ori_autoregister" name="param" value="cnts->autoregister" noLabel="Moderated registration" yesLabel="Free registration" /></td>
-        <td>&nbsp;</td>
-        <td onclick="np(event);"><s:help topic="Contest.xml:autoregister" /></td>
+        <td><s:yesno id="ContestSetting_autoregister" name="autoregister" value="cnts->autoregister" noLabel="Moderated registration" yesLabel="Free registration" /></td>
+        <td><s:help topic="Contest.xml:autoregister" /></td>
     </s:tr>
     <%@expand ORIG_DATE_TIME_ROW "reg_deadline" "Registration" %>
     <%@expand ORIG_TEXT_ROW "register_email" "Registration" "48" %>
     <%@expand ORIG_TEXT_ROW "register_url" "Registration" "48" %>
     <%@expand ORIG_TEXT_ROW "register_subject" "Registration" "48" %>
     <%@expand ORIG_TEXT_ROW "register_subject_en" "Registration" "48" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "register_email_file" "Registration" "48" "register-email-file" %>
+    <%@expand ORIG_TEXT_ROW_WITH_EDIT "register_email_file" "Registration" "48" "register-email-file" "Edit email template" %>
 </table>
     </div>
 
     <h3>Contest timing</h3>
 
     <div>
-<table border="0" onclick="popupTimingDialog();">
+<table border="0" class="contest-settings-section" data-section="timing">
 <% row = 1; %>
     <%@expand ORIG_DATE_TIME_ROW "sched_time" "Timing" %>
     <%@expand ORIG_DATE_TIME_ROW "open_time" "Timing" %>
@@ -917,7 +448,7 @@ function np(e)
     <h3>URLs</h3>
 
     <div>
-<table border="0" onclick="popupUrlDialog();">
+<table border="0" class="contest-settings-section" data-section="urls">
 <% row = 1; %>
 
     <%@expand ORIG_TEXT_ROW "team_url" "Url" "48" %>
@@ -931,21 +462,13 @@ function np(e)
     <h3>Contest flags</h3>
 
     <div>
-<table border="0" onclick="popupFlagsDialog();">
+<table border="0" class="contest-settings-section" data-section="flags">
 <% row = 1; %>
 
     <%@expand ORIG_BOOL_ROW "disable_team_password" %>
     <%@expand ORIG_BOOL_ROW "force_password_change" %>
     <%@expand ORIG_BOOL_ROW "simple_registration" %>
-<%
-  if (cnts->simple_registration) {
-%>
     <%@expand ORIG_BOOL_ROW "send_passwd_email" %>
-<%
-  } else {
-%><s:hidden id="Ori_send_passwd_email" name="send_passwd_email" value="cnts->send_passwd_email" check="no" /><%
-  }
-%>
 
     <%@expand ORIG_BOOL_ROW "clean_users" %>
     <%@expand ORIG_BOOL_ROW "closed" %>
@@ -1217,14 +740,14 @@ initial count = <s:v value="memb->init_count" />
     <h3>HTML headers and footers</h3>
 
     <div>
-<table border="0" onclick="popupHeadersDialog();">
+<table border="0" class="contest-settings-section" data-section="headers">
 <% row = 1; %>
 
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "users_header_file" "Headers" "48" "users-header" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "users_footer_file" "Headers" "48" "users-footer" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "copyright_file" "Headers" "48" "copyright" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "welcome_file" "Headers" "48" "welcome" %>
-    <%@expand ORIG_TEXT_ROW_WITH_EDIT "reg_welcome_file" "Headers" "48" "reg-welcome" %>
+    <%@expand ORIG_TEXT_ROW_WITH_EDIT "users_header_file" "Headers" "48" "users-header" "Edit file contents" %>
+    <%@expand ORIG_TEXT_ROW_WITH_EDIT "users_footer_file" "Headers" "48" "users-footer" "Edit file contents" %>
+    <%@expand ORIG_TEXT_ROW_WITH_EDIT "copyright_file" "Headers" "48" "copyright" "Edit file contents" %>
+    <%@expand ORIG_TEXT_ROW_WITH_EDIT "welcome_file" "Headers" "48" "welcome" "Edit file contents" %>
+    <%@expand ORIG_TEXT_ROW_WITH_EDIT "reg_welcome_file" "Headers" "48" "reg-welcome" "Edit file contents" %>
 </table>
 
     </div>
@@ -1232,7 +755,7 @@ initial count = <s:v value="memb->init_count" />
     <h3>Extra HTML attributes</h3>
 
     <div>
-<table border="0" onclick="popupAttrsDialog();">
+<table border="0" class="contest-settings-section" data-section="attrs">
 <% row = 1; %>
 
     <%@expand ORIG_TEXT_ROW "users_head_style" "Attrs" "48" %>
@@ -1251,7 +774,7 @@ initial count = <s:v value="memb->init_count" />
     <h3>E-mail notifications</h3>
 
     <div>
-<table border="0" onclick="popupNotificationsDialog();">
+<table border="0" class="contest-settings-section" data-section="notifications">
 <% row = 1; %>
 
     <%@expand ORIG_TEXT_ROW "cf_notify_email" "Notifications" "48" %>
@@ -1264,7 +787,7 @@ initial count = <s:v value="memb->init_count" />
     <h3>Advanced settings</h3>
 
     <div>
-<table border="0" onclick="popupAdvancedDialog();">
+<table border="0" class="contest-settings-section" data-section="advanced">
 <% row = 1; %>
 
     <%@expand ORIG_TEXT_ROW "dir_mode" "Advanced" "48" %>
@@ -1273,26 +796,14 @@ initial count = <s:v value="memb->init_count" />
     <%@expand ORIG_TEXT_ROW "file_group" "Advanced" "48" %>
     <%@expand ORIG_TEXT_ROW "allowed_languages" "Advanced" "48" %>
     <%@expand ORIG_TEXT_ROW "allowed_regions" "Advanced" "48" %>
-<%
-  if (cnts->assign_logins) {
-%>
     <%@expand ORIG_TEXT_ROW "login_template" "Advanced" "48" %>
-<%
-  }
-%>
-
-<%
-  if (cnts->assign_logins) {
-%>
     <%@expand ORIG_TEXT_ROW "login_template_options" "Advanced" "48" %>
-<%
-  }
-%>
-
 </table>
     </div>
 
 </div>
+
+<p id="ContestSettingsStatus" role="status">Changes are saved automatically to the editing session. Use COMMIT changes! to apply them.</p>
 
 <%@include "cnts_edit_cur_bottom_menu.csp"
 %>

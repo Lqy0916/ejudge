@@ -1,6 +1,6 @@
 <% // -*- html -*-
 %>
-<div id="StandingDialogDiv" title="Standings" style="overflow: auto;">
+<div id="StandingDialogDiv" title="Standings" class="inline-editor-source">
     <s:form id="StandingDialogForm">
         <s:hidden name="action" ac="prob-save-standing-form" />
         <input type="hidden" id="StandingDialogProbId" name="prob_id" value="" />
@@ -20,35 +20,7 @@
 
 <script type="text/javascript">
 $(function() {
-    standingDialog = $("#StandingDialogDiv").dialog({
-        autoOpen: false,
-        height: 350,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#StandingDialogForm").serialize();
-                var formURL = $("#StandingDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                standingDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
 
     $("#orig-stand_name-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
@@ -57,7 +29,7 @@ $(function() {
     $("#orig-provide_ok-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
 });
 
-function popupStandingDialog(e, skipField)
+function initializeStandingEditor(e, skipField)
 {
     $("#StandingDialogProbId").val(prob_id);
 
@@ -79,7 +51,6 @@ function popupStandingDialog(e, skipField)
 
     if (e) e.stopPropagation();
     standingDialogOnChange();
-    $("#StandingDialogDiv").dialog('open');
 }
 
 function standingDialogOnChange(field)

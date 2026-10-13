@@ -16,6 +16,7 @@
     int cur_page = 4;
     int i;
     int prob_id = 0;
+    int active = 0;
     const struct section_problem_data *prob = NULL;
     struct section_problem_data *tmp_prob = NULL;
     const struct section_problem_data *sup_prob = 0;
@@ -38,6 +39,7 @@ static const unsigned char * const form_row_attrs[]=
     if (!phr->ss->edited_cnts) FAIL(SSERV_ERR_CONTEST_NOT_EDITED);
 
 %><s:read var="prob_id" required="yes" /><%
+%><s:read var="active" default="0" ignoreerrors="yes" /><%
 
     if (prob_id <= 0) {
         i = -prob_id;
@@ -77,6 +79,7 @@ static const unsigned char * const form_row_attrs[]=
     (void) sup_id;
     (void) sup_prob;
 %><%@include "header_jqgrid.csp"
+%><%@include "cnts_inline_editor.csp"
 %>
 <script src='<s:config name="style-prefix" />priv_prob_dlg.js' type="text/javascript"></script>
 
@@ -105,7 +108,7 @@ static const unsigned char * const form_row_attrs[]=
 <%@include "cnts_edit_cur_problem_macros.csp"
 %>
 
-<div id="IdDialogDiv" title="Problem Identification" style="overflow: auto;">
+<div id="IdDialogDiv" title="Problem Identification" class="inline-editor-source">
     <s:form id="IdDialogForm">
         <s:hidden name="action" ac="prob-save-id-form" />
         <input type="hidden" id="IdDialogProbId" name="prob_id" value="" />
@@ -154,7 +157,7 @@ static const unsigned char * const form_row_attrs[]=
     </s:form>
 </div>
 
-<div id="FilesDialogDiv" title="Files and directories" style="overflow: auto;">
+<div id="FilesDialogDiv" title="Files and directories" class="inline-editor-source">
     <s:form id="FilesDialogForm">
         <s:hidden name="action" ac="prob-save-files-form" />
         <input type="hidden" id="FilesDialogProbId" name="prob_id" value="" />
@@ -200,7 +203,7 @@ static const unsigned char * const form_row_attrs[]=
     </s:form>
 </div>
 
-<div id="ValidationDialogDiv" title="Validation" style="overflow: auto;">
+<div id="ValidationDialogDiv" title="Validation" class="inline-editor-source">
     <s:form id="ValidationDialogForm">
         <s:hidden name="action" ac="prob-save-validation-form" />
         <input type="hidden" id="ValidationDialogProbId" name="prob_id" value="" />
@@ -213,7 +216,7 @@ static const unsigned char * const form_row_attrs[]=
     </s:form>
 </div>
 
-<div id="ViewDialogDiv" title="Statement View" style="overflow: auto;">
+<div id="ViewDialogDiv" title="Statement View" class="inline-editor-source">
     <s:form id="ViewDialogForm">
         <s:hidden name="action" ac="prob-save-view-form" />
         <input type="hidden" id="ViewDialogProbId" name="prob_id" value="" />
@@ -276,37 +279,9 @@ var global_score_kirov_olympiad = <s:v type="jsbool" value="global->score_system
 
 <script type="text/javascript">
 $(function() {
-    $('#ProblemAccordion').accordion({ heightStyle: "content" });
+    $('#ProblemAccordion').accordion({ heightStyle: "content", active: <s:v value="active" /> });
 
-    idDialog = $("#IdDialogDiv").dialog({
-        autoOpen: false,
-        height: 350,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#IdDialogForm").serialize();
-                var formURL = $("#IdDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                idDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-id-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
     $("#orig-internal_name-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
@@ -315,35 +290,7 @@ $(function() {
     $("#orig-variant_num-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
     $("#orig-autoassign_variants-div").toggle(<s:v type="jsbool" value="prob->variant_num > 0" />);
 
-    filesDialog = $("#FilesDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 700,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#FilesDialogForm").serialize();
-                var formURL = $("#FilesDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                filesDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-normalization-div").toggle(<s:v type="jsbool" value="tmp_prob->binary_input <= 0" />);
     $("#orig-test_dir-div").toggle(<s:v type="jsbool" value="global->advanced_layout <= 0" />);
@@ -361,67 +308,11 @@ $(function() {
     $("#orig-tgzdir_sfx-div").toggle(<s:v type="jsbool" value="tmp_prob->use_tgz > 0" />);
     $("#orig-tgzdir_pat-div").toggle(<s:v type="jsbool" value="tmp_prob->use_tgz > 0" />);
 
-    validationDialog = $("#ValidationDialogDiv").dialog({
-        autoOpen: false,
-        height: 300,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#ValidationDialogForm").serialize();
-                var formURL = $("#ValidationDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                validationDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-test_checker_env-div").toggle(<s:v type="jsbool" value="tmp_prob->test_checker_cmd && prob_id > 0" />);
 
-    viewDialog = $("#ViewDialogDiv").dialog({
-        autoOpen: false,
-        height: 300,
-        width: 600,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#ViewDialogForm").serialize();
-                var formURL = $("#ViewDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                viewDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-disable_tab-div").toggle(<s:v type="jsbool" value="global->problem_navigation > 0" />);
     $("#orig-hide_variant-div").toggle(<s:v type="jsbool" value="prob->variant_num > 0" />);
@@ -457,7 +348,7 @@ function toBool(str, def)
     }
 }
 
-function popupIdDialog(e, skipField)
+function initializeIdEditor(e, skipField)
 {
     $("#IdDialogProbId").val(prob_id);
     $("#edit-prob_id").val(prob_id);
@@ -477,7 +368,6 @@ function popupIdDialog(e, skipField)
 
     if (e) e.stopPropagation();
     idDialogOnChange();
-    $("#IdDialogDiv").dialog('open');
 }
 
 function idDialogOnChange()
@@ -491,7 +381,7 @@ function idDialogOnChange()
     $("#edit-autoassign_variants-div").toggle(num > 0);
 }
 
-function popupFilesDialog(e, skipField)
+function initializeFilesEditor(e, skipField)
 {
     $("#FilesDialogProbId").val(prob_id);
 
@@ -532,7 +422,6 @@ function popupFilesDialog(e, skipField)
 
     if (e) e.stopPropagation();
     filesDialogOnChange();
-    $("#FilesDialogDiv").dialog('open');
 }
 
 function filesDialogOnChange(field)
@@ -579,7 +468,7 @@ function filesDialogOnChange(field)
     <%@expand ONCHANGE_WITH_DEFAULT "tgzdir_sfx" %>
 }
 
-function popupValidationDialog(e, skipField)
+function initializeValidationEditor(e, skipField)
 {
     $("#ValidationDialogProbId").val(prob_id);
 
@@ -595,7 +484,6 @@ function popupValidationDialog(e, skipField)
 
     if (e) e.stopPropagation();
     validationDialogOnChange();
-    $("#ValidationDialogDiv").dialog('open');
 }
 
 function validationDialogOnChange(field)
@@ -607,7 +495,7 @@ function validationDialogOnChange(field)
     $("#edit-test_checker_env-div").toggle($("#edit-test_checker_cmd").val() != "" || (<s:v type="jsbool" value="sup_prob && sup_prob->test_checker_cmd && prob_id > 0" /> && $("#edit-test_checker_cmd_dflt").is(':checked')));
 }
 
-function popupViewDialog(e, skipField)
+function initializeViewEditor(e, skipField)
 {
     $("#ViewDialogProbId").val(prob_id);
 
@@ -619,7 +507,6 @@ function popupViewDialog(e, skipField)
 
     if (e) e.stopPropagation();
     viewDialogOnChange();
-    $("#ViewDialogDiv").dialog('open');
 }
 
 function viewDialogOnChange(field)
@@ -633,7 +520,7 @@ function viewDialogOnChange(field)
 <div id="ProblemAccordion">
     <h3>Problem identification</h3>
     <div>
-        <table border="0" onclick="popupIdDialog()">
+        <table border="0">
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-id-div">
                 <td>ID:</td>
@@ -645,28 +532,28 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-short_name-div">
                 <td>Short name:</td>
                 <td><s:textfield id="orig-short_name" readonly="readonly" name="param" value="prob->short_name" size="48" maxlength="1024" check="no" /><% if (!prob->short_name) { %>(<i>Not set</i>)<% } %></td>
-                <td><input type="button" onclick="popupIdDialog(event, 'short_name')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Id', 'short_name')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:short_name" /></td>
             </s:tr>
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-internal_name-div">
                 <td>Internal name:</td>
                 <td><s:textfield id="orig-internal_name" readonly="readonly" name="param" value="prob->internal_name" size="48" maxlength="1024" checkExpr="" /><% if (!prob->internal_name) { %>(<i>Not set</i>)<% } %></td>
-                <td><input type="button" onclick="popupIdDialog(event, 'internal_name')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Id', 'internal_name')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:internal_name" /></td>
             </s:tr>
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-uuid-div">
                 <td>UUID (optional):</td>
                 <td><s:textfield id="orig-uuid" readonly="readonly" name="param" value="prob->uuid" size="48" maxlength="1024" checkExpr="" /><% if (!prob->uuid) { %>(<i>Not set</i>)<% } %></td>
-                <td><input type="button" onclick="popupIdDialog(event, 'uuid')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Id', 'uuid')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:uuid" /></td>
             </s:tr>
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-long_name-div">
                 <td>Long name:</td>
                 <td><s:textfield id="orig-long_name" readonly="readonly" name="param" value="prob->long_name" size="48" maxlength="1024" checkExpr="" /><% if (!prob->long_name) { %>(<i>Not set</i>)<% } %></td>
-                <td><input type="button" onclick="popupIdDialog(event, 'long_name')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Id', 'long_name')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:long_name" /></td>
             </s:tr>
 
@@ -718,7 +605,7 @@ function viewDialogOnChange(field)
     <h3>Files and directories</h3>
 
     <div>
-        <table border="0" onclick="popupFilesDialog()">
+        <table border="0">
 
             <%@expand ORIG_INHERITABLE_BOOLEAN "binary_input" "Files" "Input data is binary" %>
 
@@ -765,7 +652,7 @@ function viewDialogOnChange(field)
     }
   }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'xml_file')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'xml_file')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:xml_file" /></td>
             </s:tr>
 
@@ -788,7 +675,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'test_dir')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'test_dir')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:test_dir" /></td>
             </s:tr>
 
@@ -809,7 +696,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'test_pat')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'test_pat')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:test_pat" /></td>
             </s:tr>
 
@@ -830,7 +717,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'test_sfx')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'test_sfx')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:test_sfx" /></td>
             </s:tr>
 
@@ -855,7 +742,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'corr_dir')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'corr_dir')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:corr_dir" /></td>
             </s:tr>
 
@@ -876,7 +763,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'corr_pat')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'corr_pat')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:corr_pat" /></td>
             </s:tr>
 
@@ -897,7 +784,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'corr_sfx')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'corr_sfx')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:corr_sfx" /></td>
             </s:tr>
 
@@ -922,7 +809,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'info_dir')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'info_dir')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:info_dir" /></td>
             </s:tr>
 
@@ -943,7 +830,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'info_pat')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'info_pat')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:info_pat" /></td>
             </s:tr>
 
@@ -964,7 +851,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'info_sfx')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'info_sfx')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:info_sfx" /></td>
             </s:tr>
 
@@ -987,7 +874,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'tgz_pat')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'tgz_pat')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:tgz_pat" /></td>
             </s:tr>
 
@@ -1008,7 +895,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'tgzdir_pat')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'tgzdir_pat')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:tgzdir_pat" /></td>
             </s:tr>
 
@@ -1029,7 +916,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'tgz_sfx')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'tgz_sfx')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:tgz_sfx" /></td>
             </s:tr>
 
@@ -1050,7 +937,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupFilesDialog(event, 'tgzdir_sfx')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Files', 'tgzdir_sfx')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:tgzdir_sfx" /></td>
             </s:tr>
 
@@ -1060,7 +947,7 @@ function viewDialogOnChange(field)
     <h3>Validation</h3>
 
     <div>
-        <table border="0" onclick="popupValidationDialog()">
+        <table border="0">
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-test_checker_cmd-div">
                 <td>Test checker (validator) name:</td>
@@ -1080,7 +967,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupValidationDialog(event, 'test_checker_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Validation', 'test_checker_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:test_checker_cmd" /></td>
             </s:tr>
 
@@ -1104,7 +991,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupValidationDialog(event, 'solution_src')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Validation', 'solution_src')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:solution_src" /></td>
             </s:tr>
 
@@ -1126,7 +1013,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupValidationDialog(event, 'solution_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Validation', 'solution_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:solution_cmd" /></td>
             </s:tr>
 
@@ -1136,7 +1023,7 @@ function viewDialogOnChange(field)
     <h3>Statement view</h3>
 
     <div>
-        <table border="0" onclick="popupViewDialog()">
+        <table border="0">
 
             <%@expand ORIG_INHERITABLE_BOOLEAN "disable_tab" "View" "Disable problem tab" %>
             <%@expand ORIG_INHERITABLE_BOOLEAN "unrestricted_statement" "View" "Unrestricted problem statement" %>
@@ -1150,7 +1037,7 @@ function viewDialogOnChange(field)
     <h3>Submission</h3>
 
     <div>
-        <table border="0" onclick="popupSubmissionDialog()">
+        <table border="0">
 
             <%@expand ORIG_INHERITABLE_BOOLEAN "disable_user_submit" "Submission" "Disable user submissions" %>
             <%@expand ORIG_INHERITABLE_BOOLEAN "disable_submit_after_ok" "Submission" "Disable submissions after OK" %>
@@ -1189,14 +1076,14 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-start_date-div">
                 <td>Accept start date:</td>
                 <td><% html_date_select_2(out_f, prob->start_date, "orig-start_date", "param", NULL, 1, 0, 0); %></td>
-                <td><input type="button" onclick="popupSubmissionDialog(event, 'start_date')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Submission', 'start_date')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:start_date" /></td>
             </s:tr>
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-deadline-div">
                 <td>Accept deadline:</td>
                 <td><% html_date_select_2(out_f, prob->deadline, "orig-deadline", "param", NULL, 1, 0, 0); %></td>
-                <td><input type="button" onclick="popupSubmissionDialog(event, 'deadline')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Submission', 'deadline')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:deadline" /></td>
             </s:tr>
 
@@ -1206,7 +1093,7 @@ function viewDialogOnChange(field)
     <h3>Compiling</h3>
 
     <div>
-        <table border="0" onclick="popupCompilingDialog()">
+        <table border="0">
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-style_checker_cmd-div">
                 <td>Style checker name:</td>
@@ -1228,7 +1115,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCompilingDialog(event, 'style_checker_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Compiling', 'style_checker_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:style_checker_cmd" /></td>
             </s:tr>
 
@@ -1254,7 +1141,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCompilingDialog(event, 'source_header')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Compiling', 'source_header')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:source_header" /></td>
             </s:tr>
 
@@ -1277,7 +1164,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCompilingDialog(event, 'source_footer')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Compiling', 'source_footer')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:source_footer" /></td>
             </s:tr>
 
@@ -1288,7 +1175,7 @@ function viewDialogOnChange(field)
     <h3>Running</h3>
 
     <div>
-        <table border="0" onclick="popupRunningDialog()">
+        <table border="0">
             <%@expand ORIG_INHERITABLE_BOOLEAN "disable_testing" "Running" "Disable any testing of submissions" %>
             <%@expand ORIG_INHERITABLE_BOOLEAN "disable_auto_testing" "Running" "Disable automatic testing of submissions" %>
             <%@expand ORIG_INHERITABLE_BOOLEAN "enable_compilation" "Running" "Still compile runs to mark as ACCEPTED" %>
@@ -1308,7 +1195,7 @@ function viewDialogOnChange(field)
 %><s:textfield id="orig-input_file" readonly="readonly" name="param" value="value" size="48" maxlength="1024" checkExpr="" /><% if (!value) { %>(<i>Default</i>: <i><s:v value="tmp_prob->input_file" checkExpr="" /></i>)<% } %><%
     }
 %></td>
-                <td><input type="button" onclick="popupRunningDialog(event, 'input_file')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Running', 'input_file')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:input_file" /></td>
             </s:tr>
 
@@ -1326,7 +1213,7 @@ function viewDialogOnChange(field)
 %><s:textfield id="orig-output_file" readonly="readonly" name="param" value="value" size="48" maxlength="1024" checkExpr="" /><% if (!value) { %>(<i>Default</i>: <i><s:v value="tmp_prob->output_file" checkExpr="" /></i>)<% } %><%
     }
 %></td>
-                <td><input type="button" onclick="popupRunningDialog(event, 'output_file')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Running', 'output_file')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:output_file" /></td>
             </s:tr>
 
@@ -1352,7 +1239,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupRunningDialog(event, 'start_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Running', 'start_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:start_cmd" /></td>
             </s:tr>
 
@@ -1364,7 +1251,7 @@ function viewDialogOnChange(field)
     <h3>Limits</h3>
 
     <div>
-        <table border="0" onclick="popupLimitsDialog()">
+        <table border="0">
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-time_limit_millis-div">
                 <td>Processor time limit (ms):</td>
@@ -1580,7 +1467,7 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-umask-div">
                 <td>Umask value:</td>
                 <td><s:textfield id="orig-umask" readonly="readonly" name="param" value="prob->umask" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupLimitsDialog(event, 'umask')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Limits', 'umask')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:umask" /></td>
             </s:tr>
 
@@ -1601,7 +1488,7 @@ function viewDialogOnChange(field)
     <h3>Checking, interacting, evaluating</h3>
 
     <div>
-        <table border="0" onclick="popupCheckingDialog()">
+        <table border="0">
 <%
   {
     const struct std_checker_info *std_checkers = super_html_std_checkers;
@@ -1647,7 +1534,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCheckingDialog(event, 'check_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Checking', 'check_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:check_cmd" /></td>
             </s:tr>
 <%
@@ -1808,7 +1695,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCheckingDialog(event, 'valuer_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Checking', 'valuer_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:valuer_cmd" /></td>
             </s:tr>
 <%
@@ -1837,7 +1724,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCheckingDialog(event, 'standard_valuer')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Checking', 'standard_valuer')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:standard_valuer" /></td>
             </s:tr>
 <%
@@ -1870,7 +1757,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCheckingDialog(event, 'interactor_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Checking', 'interactor_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:interactor_cmd" /></td>
             </s:tr>
 <%
@@ -1951,7 +1838,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupCheckingDialog(event, 'init_cmd')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Checking', 'init_cmd')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:init_cmd" /></td>
             </s:tr>
 
@@ -1963,7 +1850,7 @@ function viewDialogOnChange(field)
     <h3>Scoring</h3>
 
     <div>
-        <table border="0" onclick="popupScoringDialog()">
+        <table border="0">
 
             <%@expand ORIG_INHERITABLE_BOOLEAN "ignore_compile_errors" "Scoring" "Ignore compilation errors" %>
             <%@expand ORIG_INHERITABLE_BOOLEAN "use_ac_not_ok" "Scoring" "Use PR (pending review) status instead of OK" %>
@@ -1971,7 +1858,7 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-ok_status-div">
                 <td>Success status:</td>
                 <td><s:textfield id="orig-ok_status" readonly="readonly" name="param" value="prob->ok_status" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupScoringDialog(event, 'ok_status')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Scoring', 'ok_status')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:ok_status" /></td>
             </s:tr>
 
@@ -2114,7 +2001,7 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-test_score_list-div">
                 <td>Test scores for tests:</td>
                 <td><s:textfield id="orig-test_score_list-div" readonly="readonly" name="param" value="prob->test_score_list" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupScoringDialog(event, 'test_score_list')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Scoring', 'test_score_list')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:test_score_list" /></td>
             </s:tr>
 
@@ -2140,7 +2027,7 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-score_tests-div">
                 <td>Tests for problem scores:</td>
                 <td><s:textfield id="orig-score_tests" readonly="readonly" name="param" value="prob->score_tests" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupScoringDialog(event, 'score_tests')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Scoring', 'score_tests')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:score_tests" /></td>
             </s:tr>
 
@@ -2156,7 +2043,7 @@ function viewDialogOnChange(field)
 %>(<i>Not set</i>)<%
 }
 %></td>
-                <td><input type="button" onclick="popupScoringDialog(event, 'test_sets')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Scoring', 'test_sets')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:test_sets" /></td>
             </s:tr>
 <%
@@ -2189,7 +2076,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupScoringDialog(event, 'score_bonus')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Scoring', 'score_bonus')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:score_bonus" /></td>
             </s:tr>
 <%
@@ -2202,7 +2089,7 @@ function viewDialogOnChange(field)
     <h3>Feedback</h3>
 
     <div>
-        <table border="0" onclick="popupFeedbackDialog()">
+        <table border="0">
 
             <%@expand ORIG_INHERITABLE_BOOLEAN "team_enable_rep_view" "Feedback" "Contestant may view testing protocol" %>
             <%@expand ORIG_INHERITABLE_BOOLEAN "team_enable_ce_view" "Feedback" "Contestant may view compilation errors" %>
@@ -2212,14 +2099,14 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-open_tests-div">
                 <td>Tests open for participants:</td>
                 <td><s:textfield id="orig-open_tests" readonly="readonly" name="param" value="prob->open_tests" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupFeedbackDialog(event, 'open_tests')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Feedback', 'open_tests')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:open_tests" /></td>
             </s:tr>
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-final_open_tests-div">
                 <td>Tests open for participants finally:</td>
                 <td><s:textfield id="orig-final_open_tests" readonly="readonly" name="param" value="prob->final_open_tests" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupFeedbackDialog(event, 'final_open_tests')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Feedback', 'final_open_tests')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:final_open_tests" /></td>
             </s:tr>
 
@@ -2229,14 +2116,14 @@ function viewDialogOnChange(field)
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-tokens-div">
                 <td>Token specification:</td>
                 <td><s:textfield id="orig-tokens" readonly="readonly" name="param" value="prob->tokens" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupFeedbackDialog(event, 'tokens')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Feedback', 'tokens')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="serve.cfg:problem:tokens" /></td>
             </s:tr>
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-token_open_tests-div">
                 <td>Tests open for tokens:</td>
                 <td><s:textfield id="orig-token_open_tests" readonly="readonly" name="param" value="prob->token_open_tests" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupFeedbackDialog(event, 'token_open_tests')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Feedback', 'token_open_tests')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="serve.cfg:problem:token_open_tests" /></td>
             </s:tr>
 
@@ -2291,18 +2178,18 @@ function viewDialogOnChange(field)
     <h3>Standings</h3>
 
     <div>
-        <table border="0" onclick="popupStandingDialog()">
+        <table border="0">
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-stand_name-div">
                 <td>Title for the standings column:</td>
                 <td><s:textfield id="orig-stand_name" readonly="readonly" name="param" value="prob->stand_name" size="48" maxlength="1024" checkExpr="" /><% if (!prob->stand_name) { %>(<i>Not set</i>)<% } %></td>
-                <td><input type="button" onclick="popupStandingDialog(event, 'stand_name')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Standing', 'stand_name')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:stand_name" /></td>
             </s:tr>
 
             <s:tr attr="form_row_attrs[row ^= 1]" id="orig-stand_column-div">
                 <td>Collate this problem with the specified one:</td>
                 <td><s:textfield id="orig-stand_column" readonly="readonly" name="param" value="prob->stand_column" size="48" maxlength="1024" checkExpr="" /><% if (!prob->stand_column) { %>(<i>Not set</i>)<% } %></td>
-                <td><input type="button" onclick="popupStandingDialog(event, 'stand_column')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Standing', 'stand_column')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:stand_column" /></td>
             </s:tr>
 
@@ -2333,7 +2220,7 @@ function viewDialogOnChange(field)
       }
     }
 %></td>
-                <td><input type="button" onclick="popupStandingDialog(event, 'stand_attr')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Standing', 'stand_attr')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:stand_attr" /></td>
             </s:tr>
 <%
@@ -2349,7 +2236,7 @@ function viewDialogOnChange(field)
     unsigned char *strs = 0;
     if (prob->score_view && prob->score_view[0]) strs = sarray_unparse(prob->score_view);
 %><s:textfield id="orig-score_view" readonly="readonly" name="param" value="strs" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupStandingDialog(event, 'score_view')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Standing', 'score_view')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:score_view" /></td>
             </s:tr>
 <%
@@ -2369,7 +2256,7 @@ function viewDialogOnChange(field)
     unsigned char *strs = 0;
     if (prob->provide_ok && prob->provide_ok[0]) strs = sarray_unparse(prob->provide_ok);
 %><s:textfield id="orig-provide_ok" readonly="readonly" name="param" value="strs" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popupStandingDialog(event, 'provide_ok')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, 'Standing', 'provide_ok')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:provide_ok" /></td>
             </s:tr>
 <%
@@ -2399,6 +2286,37 @@ function viewDialogOnChange(field)
 %>
 
 </div>
+
+
+<script type="text/javascript">
+$(function() {
+    initializeIdEditor();
+    initializeFilesEditor();
+    initializeValidationEditor();
+    initializeViewEditor();
+    initializeSubmissionEditor();
+    initializeCompilingEditor();
+    initializeRunningEditor();
+    initializeLimitsEditor();
+    initializeCheckingEditor();
+    initializeScoringEditor();
+    initializeFeedbackEditor();
+    initializeStandingEditor();
+    ejInline.mount("Id", { onChange: idDialogOnChange, refreshFields: ["super", "type"] });
+    ejInline.mount("Files", { onChange: filesDialogOnChange });
+    ejInline.mount("Validation", { onChange: validationDialogOnChange });
+    ejInline.mount("View", { onChange: viewDialogOnChange });
+    ejInline.mount("Submission", { onChange: submissionDialogOnChange });
+    ejInline.mount("Compiling", { onChange: compilingDialogOnChange });
+    ejInline.mount("Running", { onChange: runningDialogOnChange });
+    ejInline.mount("Limits", { onChange: limitsDialogOnChange });
+    ejInline.mount("Checking", { onChange: checkingDialogOnChange });
+    ejInline.mount("Scoring", { onChange: scoringDialogOnChange });
+    ejInline.mount("Feedback", { onChange: feedbackDialogOnChange });
+    ejInline.mount("Standing", { onChange: standingDialogOnChange });
+    ejInline.start();
+});
+</script>
 
 <%
 bottom_links: ;

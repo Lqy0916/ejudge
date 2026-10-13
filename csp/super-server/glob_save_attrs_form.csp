@@ -169,4 +169,6 @@ cleanup:;
     sarray_free(stand_page_col_attr);
     html_armor_free(&ab);
     xfree(msg_s);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

@@ -115,7 +115,7 @@
     xfree(alloc_value);
     alloc_value = sarray_unparse(prob->@1);
 %><s:textfield id="orig-@1" readonly="readonly" name="param" value="alloc_value" size="48" maxlength="1024" checkExpr="" /></td>
-                <td><input type="button" onclick="popup@2Dialog(event, '@1')" value="Clear" /></td>
+                <td><input type="button" onclick="ejInline.clear(event, '@2', '@1')" value="Clear" /></td>
                 <td onclick="np(event);"><s:help topic="Serve.cfg:problem:@1" /></td>
             </s:tr>
 #%>

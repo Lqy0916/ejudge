@@ -1,0 +1,392 @@
+<% //-*- c -*-
+%><%@include "includes.csp"
+%><%
+
+%><%@set getter_name = "csp_get_cnts_save_contest_form"
+%><%@set ac_prefix = "SSERV_CMD_"
+%><%@set err_prefix = "SSERV_ERR_"
+%><%@page csp_view_cnts_save_contest_form(PageInterface *pg, FILE *log_f, FILE *out_f, struct http_request_info *phr)
+%><%@include "stdvars.csp"
+%><%
+    snprintf(phr->content_type, sizeof(phr->content_type), "application/json; charset=%s", EJUDGE_CHARSET);
+
+    unsigned char *name = NULL;
+    unsigned char *name_en = NULL;
+    unsigned char *main_url = NULL;
+    unsigned char *keywords = NULL;
+    unsigned char *comment = NULL;
+    int user_contest = 0;
+    unsigned char *default_locale = NULL;
+    int locale_id = -1;
+    ejintbool_t personal = 0;
+
+    ejintbool_t closed = 0;
+    ejintbool_t disable_team_password = 0;
+    ejintbool_t force_password_change = 0;
+    ejintbool_t simple_registration = 0;
+    ejintbool_t send_passwd_email = 0;
+    ejintbool_t invisible = 0;
+    ejintbool_t clean_users = 0;
+    ejintbool_t disable_member_delete = 0;
+    ejintbool_t assign_logins = 0;
+    ejintbool_t force_registration = 0;
+    ejintbool_t disable_name = 0;
+    ejintbool_t enable_password_recovery = 0;
+    ejintbool_t exam_mode = 0;
+    ejintbool_t disable_password_change = 0;
+    ejintbool_t disable_locale_change = 0;
+    ejintbool_t allow_reg_data_edit = 0;
+    ejintbool_t enable_user_telegram = 0;
+    ejintbool_t enable_avatar = 0;
+    ejintbool_t enable_local_pages = 0;
+    ejintbool_t read_only_name = 0;
+    ejintbool_t enable_oauth = 0;
+    ejintbool_t enable_reminders = 0;
+
+    ejintbool_t autoregister = 0;
+    const unsigned char *reg_deadline_time = NULL;
+    const unsigned char *reg_deadline_date = NULL;
+    unsigned char *register_email = NULL;
+    unsigned char *register_url = NULL;
+    unsigned char *register_subject = NULL;
+    unsigned char *register_subject_en = NULL;
+    unsigned char *register_email_file = NULL;
+    time_t reg_deadline = 0;
+
+    const unsigned char *sched_time_time = NULL;
+    const unsigned char *sched_time_date = NULL;
+    const unsigned char *open_time_time = NULL;
+    const unsigned char *open_time_date = NULL;
+    const unsigned char *close_time_time = NULL;
+    const unsigned char *close_time_date = NULL;
+    time_t sched_time = 0;
+    time_t open_time = 0;
+    time_t close_time = 0;
+
+    unsigned char *team_url = NULL;
+    unsigned char *standings_url = NULL;
+    unsigned char *problems_url = NULL;
+    unsigned char *logo_url = NULL;
+    unsigned char *css_url = NULL;
+
+    unsigned char *users_header_file = NULL;
+    unsigned char *users_footer_file = NULL;
+    unsigned char *copyright_file = NULL;
+    unsigned char *welcome_file = NULL;
+    unsigned char *reg_welcome_file = NULL;
+
+    unsigned char *users_head_style = NULL;
+    unsigned char *users_par_style = NULL;
+    unsigned char *users_table_style = NULL;
+    unsigned char *users_verb_style = NULL;
+    unsigned char *users_table_format = NULL;
+    unsigned char *users_table_format_en = NULL;
+    unsigned char *users_table_legend = NULL;
+    unsigned char *users_table_legend_en = NULL;
+    unsigned char *user_name_comment = NULL;
+
+    unsigned char *cf_notify_email = NULL;
+    unsigned char *clar_notify_email = NULL;
+    unsigned char *daily_stat_email = NULL;
+
+    unsigned char *dir_mode = NULL;
+    unsigned char *dir_group = NULL;
+    unsigned char *file_mode = NULL;
+    unsigned char *file_group = NULL;
+    unsigned char *allowed_languages = NULL;
+    unsigned char *allowed_regions = NULL;
+    unsigned char *login_template = NULL;
+    unsigned char *login_template_options = NULL;
+
+    int error_section = -1;
+    const unsigned char *error_field = "";
+    opcap_t caps = 0;
+    char *msg_s = NULL;
+    size_t msg_z = 0;
+    FILE *msg_f = open_memstream(&msg_s, &msg_z);
+
+%><s:read var="name" normalize="yes" /><%
+%><s:read var="name_en" normalize="yes" /><%
+%><s:read var="main_url" normalize="yes" /><%
+%><s:read var="keywords" normalize="yes" /><%
+%><s:read var="comment" normalize="yes" /><%
+%><s:read var="user_contest" default="0" /><%
+%><s:read var="default_locale" normalize="yes" /><%
+%><s:read var="personal" default="0" /><%
+
+%><s:read var="closed" default="0" /><%
+%><s:read var="disable_team_password" default="0" /><%
+%><s:read var="force_password_change" default="0" /><%
+%><s:read var="simple_registration" default="0" /><%
+%><s:read var="send_passwd_email" default="0" /><%
+%><s:read var="invisible" default="0" /><%
+%><s:read var="clean_users" default="0" /><%
+%><s:read var="disable_member_delete" default="0" /><%
+%><s:read var="assign_logins" default="0" /><%
+%><s:read var="force_registration" default="0" /><%
+%><s:read var="disable_name" default="0" /><%
+%><s:read var="enable_password_recovery" default="0" /><%
+%><s:read var="exam_mode" default="0" /><%
+%><s:read var="disable_password_change" default="0" /><%
+%><s:read var="disable_locale_change" default="0" /><%
+%><s:read var="allow_reg_data_edit" default="0" /><%
+%><s:read var="enable_user_telegram" default="0" /><%
+%><s:read var="enable_avatar" default="0" /><%
+%><s:read var="enable_local_pages" default="0" /><%
+%><s:read var="read_only_name" default="0" /><%
+%><s:read var="enable_oauth" default="0" /><%
+%><s:read var="enable_reminders" default="0" /><%
+
+%><s:read var="autoregister" default="0" /><%
+%><s:read var="reg_deadline_time" /><%
+%><s:read var="reg_deadline_date" /><%
+%><s:read var="register_email" normalize="yes" /><%
+%><s:read var="register_url" normalize="yes" /><%
+%><s:read var="register_subject" normalize="yes" /><%
+%><s:read var="register_subject_en" normalize="yes" /><%
+%><s:read var="register_email_file" normalize="yes" /><%
+
+%><s:read var="sched_time_time" /><%
+%><s:read var="sched_time_date" /><%
+%><s:read var="open_time_time" /><%
+%><s:read var="open_time_date" /><%
+%><s:read var="close_time_time" /><%
+%><s:read var="close_time_date" /><%
+
+%><s:read var="team_url" normalize="yes" /><%
+%><s:read var="standings_url" normalize="yes" /><%
+%><s:read var="problems_url" normalize="yes" /><%
+%><s:read var="logo_url" normalize="yes" /><%
+%><s:read var="css_url" normalize="yes" /><%
+
+%><s:read var="users_header_file" normalize="yes" /><%
+%><s:read var="users_footer_file" normalize="yes" /><%
+%><s:read var="copyright_file" normalize="yes" /><%
+%><s:read var="welcome_file" normalize="yes" /><%
+%><s:read var="reg_welcome_file" normalize="yes" /><%
+
+%><s:read var="users_head_style" normalize="yes" /><%
+%><s:read var="users_par_style" normalize="yes" /><%
+%><s:read var="users_table_style" normalize="yes" /><%
+%><s:read var="users_verb_style" normalize="yes" /><%
+%><s:read var="users_table_format" normalize="yes" /><%
+%><s:read var="users_table_format_en" normalize="yes" /><%
+%><s:read var="users_table_legend" normalize="yes" /><%
+%><s:read var="users_table_legend_en" normalize="yes" /><%
+%><s:read var="user_name_comment" normalize="yes" /><%
+
+%><s:read var="cf_notify_email" normalize="yes" /><%
+%><s:read var="clar_notify_email" normalize="yes" /><%
+%><s:read var="daily_stat_email" normalize="yes" /><%
+
+%><s:read var="dir_mode" normalize="yes" /><%
+%><s:read var="dir_group" normalize="yes" /><%
+%><s:read var="file_mode" normalize="yes" /><%
+%><s:read var="file_group" normalize="yes" /><%
+%><s:read var="allowed_languages" normalize="yes" /><%
+%><s:read var="allowed_regions" normalize="yes" /><%
+%><s:read var="login_template" normalize="yes" /><%
+%><s:read var="login_template_options" normalize="yes" /><%
+
+    if (phr->priv_level != PRIV_LEVEL_ADMIN
+        || ejudge_cfg_opcaps_find(phr->config, phr->login, &caps) < 0
+        || opcaps_check(caps, OPCAP_EDIT_CONTEST) < 0) {
+        fprintf(msg_f, "Permission denied");
+        retval = SSERV_ERR_PERMISSION_DENIED;
+    } else if (!phr->ss || !phr->ss->edited_cnts) {
+        fprintf(msg_f, "Contest is not being edited");
+        retval = SSERV_ERR_CONTEST_NOT_EDITED;
+    }
+
+#define SET_FORM_ERROR(section, field, message) do { fprintf(msg_f, "%s<br/>", message); retval = SSERV_ERR_INV_PARAM; if (error_section < 0) { error_section = section; error_field = field; } } while (0)
+
+    if (!retval) {
+        if (!name) {
+            SET_FORM_ERROR(0, "name", "Contest Name must be specified");
+        }
+        if (user_contest < 0) user_contest = 0;
+        if (user_contest > 0) {
+            const struct contest_desc *other_cnts = NULL;
+            if (contests_get(user_contest, &other_cnts) < 0 || !other_cnts || other_cnts->user_contest) {
+                SET_FORM_ERROR(0, "user_contest", "Invalid User Contest");
+                user_contest = 0;
+            }
+        }
+        if (default_locale) {
+            locale_id = l10n_parse_locale(default_locale);
+            if (locale_id < 0) {
+                SET_FORM_ERROR(0, "default_locale", "Invalid Default Locale");
+            }
+        }
+        if (parse_date_twopart(reg_deadline_date, reg_deadline_time, &reg_deadline) < 0) {
+            SET_FORM_ERROR(1, "reg_deadline_date", "Registration deadline is invalid");
+        }
+        if (parse_date_twopart(sched_time_date, sched_time_time, &sched_time) < 0) {
+            SET_FORM_ERROR(2, "sched_time_date", "Scheduled start time is invalid");
+        }
+        if (parse_date_twopart(open_time_date, open_time_time, &open_time) < 0) {
+            SET_FORM_ERROR(2, "open_time_date", "Contest open time is invalid");
+        }
+        if (parse_date_twopart(close_time_date, close_time_time, &close_time) < 0) {
+            SET_FORM_ERROR(2, "close_time_date", "Contest close time is invalid");
+        }
+    }
+
+#undef SET_FORM_ERROR
+
+    if (!retval) {
+        struct contest_desc *edited_cnts = phr->ss->edited_cnts;
+
+#define REPLACE_STRING(field, value) do { xfree(edited_cnts->field); edited_cnts->field = xstrdup2(value); } while (0)
+
+        REPLACE_STRING(name, name);
+        REPLACE_STRING(name_en, name_en);
+        REPLACE_STRING(main_url, main_url);
+        REPLACE_STRING(keywords, keywords);
+        REPLACE_STRING(comment, comment);
+        xfree(edited_cnts->user_contest);
+        edited_cnts->user_contest = NULL;
+        if (user_contest > 0) {
+            unsigned char cnts_buf[64];
+            snprintf(cnts_buf, sizeof(cnts_buf), "%d", user_contest);
+            edited_cnts->user_contest = xstrdup(cnts_buf);
+        }
+        xfree(edited_cnts->default_locale);
+        edited_cnts->default_locale = NULL;
+        if (locale_id >= 0) {
+            edited_cnts->default_locale = xstrdup2(l10n_unparse_locale(locale_id));
+        }
+        edited_cnts->personal = personal;
+
+        edited_cnts->closed = closed;
+        edited_cnts->disable_team_password = disable_team_password;
+        edited_cnts->force_password_change = force_password_change;
+        edited_cnts->simple_registration = simple_registration;
+        edited_cnts->send_passwd_email = send_passwd_email;
+        edited_cnts->invisible = invisible;
+        edited_cnts->clean_users = clean_users;
+        edited_cnts->disable_member_delete = disable_member_delete;
+        edited_cnts->assign_logins = assign_logins;
+        edited_cnts->force_registration = force_registration;
+        edited_cnts->disable_name = disable_name;
+        edited_cnts->enable_password_recovery = enable_password_recovery;
+        edited_cnts->exam_mode = exam_mode;
+        edited_cnts->disable_password_change = disable_password_change;
+        edited_cnts->disable_locale_change = disable_locale_change;
+        edited_cnts->allow_reg_data_edit = allow_reg_data_edit;
+        edited_cnts->enable_user_telegram = enable_user_telegram;
+        edited_cnts->enable_avatar = enable_avatar;
+        edited_cnts->enable_local_pages = enable_local_pages;
+        edited_cnts->read_only_name = read_only_name;
+        edited_cnts->enable_oauth = enable_oauth;
+        edited_cnts->enable_reminders = enable_reminders;
+
+        edited_cnts->autoregister = autoregister;
+        edited_cnts->reg_deadline = reg_deadline;
+        REPLACE_STRING(register_email, register_email);
+        REPLACE_STRING(register_url, register_url);
+        REPLACE_STRING(register_subject, register_subject);
+        REPLACE_STRING(register_subject_en, register_subject_en);
+        REPLACE_STRING(register_email_file, register_email_file);
+
+        edited_cnts->sched_time = sched_time;
+        edited_cnts->open_time = open_time;
+        edited_cnts->close_time = close_time;
+
+        REPLACE_STRING(team_url, team_url);
+        REPLACE_STRING(standings_url, standings_url);
+        REPLACE_STRING(problems_url, problems_url);
+        REPLACE_STRING(logo_url, logo_url);
+        REPLACE_STRING(css_url, css_url);
+
+        REPLACE_STRING(users_header_file, users_header_file);
+        REPLACE_STRING(users_footer_file, users_footer_file);
+        REPLACE_STRING(copyright_file, copyright_file);
+        REPLACE_STRING(welcome_file, welcome_file);
+        REPLACE_STRING(reg_welcome_file, reg_welcome_file);
+
+        REPLACE_STRING(users_head_style, users_head_style);
+        REPLACE_STRING(users_par_style, users_par_style);
+        REPLACE_STRING(users_table_style, users_table_style);
+        REPLACE_STRING(users_verb_style, users_verb_style);
+        REPLACE_STRING(users_table_format, users_table_format);
+        REPLACE_STRING(users_table_format_en, users_table_format_en);
+        REPLACE_STRING(users_table_legend, users_table_legend);
+        REPLACE_STRING(users_table_legend_en, users_table_legend_en);
+        REPLACE_STRING(user_name_comment, user_name_comment);
+
+        REPLACE_STRING(cf_notify_email, cf_notify_email);
+        REPLACE_STRING(clar_notify_email, clar_notify_email);
+        REPLACE_STRING(daily_stat_email, daily_stat_email);
+
+        REPLACE_STRING(dir_mode, dir_mode);
+        REPLACE_STRING(dir_group, dir_group);
+        REPLACE_STRING(file_mode, file_mode);
+        REPLACE_STRING(file_group, file_group);
+        REPLACE_STRING(allowed_languages, allowed_languages);
+        REPLACE_STRING(allowed_regions, allowed_regions);
+        REPLACE_STRING(login_template, login_template);
+        REPLACE_STRING(login_template_options, login_template_options);
+#undef REPLACE_STRING
+    }
+
+cleanup:;
+    if (retval && ftell(msg_f) == 0) {
+        fprintf(msg_f, "Invalid settings parameter");
+    }
+    fclose(msg_f); msg_f = NULL;
+%>
+{
+    "retval" : <s:v value="retval" />,
+    "messages" : "<s:v value="msg_s" json="yes" checkExpr="" />",
+    "active" : <s:v value="error_section" />,
+    "error_field" : "<s:v value="error_field" json="yes" checkExpr="" />"
+}
+<%
+    xfree(name);
+    xfree(name_en);
+    xfree(main_url);
+    xfree(keywords);
+    xfree(comment);
+    xfree(default_locale);
+    xfree(register_email);
+    xfree(register_url);
+    xfree(register_subject);
+    xfree(register_subject_en);
+    xfree(register_email_file);
+    xfree(team_url);
+    xfree(standings_url);
+    xfree(problems_url);
+    xfree(logo_url);
+    xfree(css_url);
+    xfree(users_header_file);
+    xfree(users_footer_file);
+    xfree(copyright_file);
+    xfree(welcome_file);
+    xfree(reg_welcome_file);
+    xfree(users_head_style);
+    xfree(users_par_style);
+    xfree(users_table_style);
+    xfree(users_verb_style);
+    xfree(users_table_format);
+    xfree(users_table_format_en);
+    xfree(users_table_legend);
+    xfree(users_table_legend_en);
+    xfree(user_name_comment);
+    xfree(cf_notify_email);
+    xfree(clar_notify_email);
+    xfree(daily_stat_email);
+    xfree(dir_mode);
+    xfree(dir_group);
+    xfree(file_mode);
+    xfree(file_group);
+    xfree(allowed_languages);
+    xfree(allowed_regions);
+    xfree(login_template);
+    xfree(login_template_options);
+    html_armor_free(&ab);
+    xfree(msg_s);
+    // The JSON body carries the validation result. A nonzero render return
+    // makes the dispatcher replace it with an error page or another action.
+    retval = 0;
+%>

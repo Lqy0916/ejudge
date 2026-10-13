@@ -1,6 +1,6 @@
 <% // -*- html -*-
 %>
-<div id="FeedbackDialogDiv" title="Feedback" style="overflow: auto;">
+<div id="FeedbackDialogDiv" title="Feedback" class="inline-editor-source">
     <s:form id="FeedbackDialogForm">
         <s:hidden name="action" ac="prob-save-feedback-form" />
         <input type="hidden" id="FeedbackDialogProbId" name="prob_id" value="" />
@@ -27,35 +27,7 @@
 
 <script type="text/javascript">
 $(function() {
-    feedbackDialog = $("#FeedbackDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#FeedbackDialogForm").serialize();
-                var formURL = $("#FeedbackDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                feedbackDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-team_enable_ce_view-div").toggle(<s:v type="jsbool" value="tmp_prob->team_enable_rep_view <= 0" />);
     $("#orig-team_show_judge_report-div").toggle(<s:v type="jsbool" value="tmp_prob->team_enable_rep_view > 0" />);
@@ -70,7 +42,7 @@ $(function() {
     $("#orig-min_tests_to_accept-div").toggle(global_score_olympiad && <s:v type="jsbool" value="tmp_prob->tests_to_accept >= 0" />);
 });
 
-function popupFeedbackDialog(e, skipField)
+function initializeFeedbackEditor(e, skipField)
 {
     $("#FeedbackDialogProbId").val(prob_id);
 
@@ -100,7 +72,6 @@ function popupFeedbackDialog(e, skipField)
 
     if (e) e.stopPropagation();
     feedbackDialogOnChange();
-    $("#FeedbackDialogDiv").dialog('open');
 }
 
 function feedbackDialogOnChange(field)

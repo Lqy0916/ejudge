@@ -1,6 +1,6 @@
 <% // -*- html -*-
 %>
-<div id="LimitsDialogDiv" title="Limits" style="overflow: auto;">
+<div id="LimitsDialogDiv" title="Limits" class="inline-editor-source">
     <s:form id="LimitsDialogForm">
         <s:hidden name="action" ac="prob-save-limits-form" />
         <input type="hidden" id="LimitsDialogProbId" name="prob_id" value="" />
@@ -31,35 +31,7 @@
 
 <script type="text/javascript">
 $(function() {
-    limitsDialog = $("#LimitsDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#LimitsDialogForm").serialize();
-                var formURL = $("#LimitsDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                limitsDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-lang_time_adj-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
     $("#orig-lang_time_adj_millis-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
@@ -68,7 +40,7 @@ $(function() {
     $("#orig-lang_max_rss_size-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
 });
 
-function popupLimitsDialog(e, skipField)
+function initializeLimitsEditor(e, skipField)
 {
     $("#LimitsDialogProbId").val(prob_id);
 
@@ -111,7 +83,6 @@ function popupLimitsDialog(e, skipField)
 
     if (e) e.stopPropagation();
     limitsDialogOnChange();
-    $("#LimitsDialogDiv").dialog('open');
 }
 
 function limitsDialogOnChange(field)

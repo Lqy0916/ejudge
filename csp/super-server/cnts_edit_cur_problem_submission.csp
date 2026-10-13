@@ -1,6 +1,6 @@
 <% // -*- html -*-
 %>
-<div id="SubmissionDialogDiv" title="Submission" style="overflow: auto;">
+<div id="SubmissionDialogDiv" title="Submission" class="inline-editor-source">
     <s:form id="SubmissionDialogForm">
         <s:hidden name="action" ac="prob-save-submission-form" />
         <input type="hidden" id="SubmissionDialogProbId" name="prob_id" value="" />
@@ -25,35 +25,7 @@
 
 <script type="text/javascript">
 $(function() {
-    submissionDialog = $("#SubmissionDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#SubmissionDialogForm").serialize();
-                var formURL = $("#SubmissionDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                submissionDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $('#edit-start_date_time').timepicker({ 'timeFormat': 'H:i', 'step': 30 });
     $('#edit-start_date_date').datepicker({ dateFormat: "yy-mm-dd", firstDay: 1, showButtonPanel: true });
@@ -67,7 +39,7 @@ $(function() {
     $("#orig-deadline-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
 });
 
-function popupSubmissionDialog(e, skipField)
+function initializeSubmissionEditor(e, skipField)
 {
     $("#SubmissionDialogProbId").val(prob_id);
 
@@ -95,7 +67,6 @@ function popupSubmissionDialog(e, skipField)
 
     if (e) e.stopPropagation();
     submissionDialogOnChange();
-    $("#SubmissionDialogDiv").dialog('open');
 }
 
 function submissionDialogOnChange(field)

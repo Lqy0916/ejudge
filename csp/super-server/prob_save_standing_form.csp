@@ -108,4 +108,6 @@ cleanup:;
     xfree(stand_attr);
     sarray_free(score_view);
     sarray_free(provide_ok);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

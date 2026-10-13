@@ -18,7 +18,6 @@
     unsigned char cs_conf_file[PATH_MAX];
     unsigned char num_buf[1024];
     unsigned char *env = 0;
-    unsigned char onclickstr_buf[128];
     size_t text_z = 0;
     char *text_s = NULL;
     FILE *text_f = NULL;
@@ -42,6 +41,7 @@ static const unsigned char * const form_row_attrs[]=
     cnts = phr->ss->edited_cnts;
     struct section_global_data *global = phr->ss->global;
 %><%@include "header_jqgrid.csp"
+%><%@include "cnts_inline_editor.csp"
 %>
 
 <%@include "cnts_edit_cur_top_menu.csp"
@@ -91,7 +91,7 @@ static const unsigned char * const form_row_attrs[]=
   }
 %>
 
-<div id="LimitsDialogDiv" title="Compilation Limits" style="overflow: auto;">
+<div id="LimitsDialogDiv" title="Compilation Limits" class="inline-editor-source">
     <s:form id="LimitsDialogForm">
         <s:hidden name="action" ac="glob-save-limits-form" />
         <div id="limits-compile_max_vm_size-div">
@@ -109,7 +109,7 @@ static const unsigned char * const form_row_attrs[]=
     </s:form>
 </div>
 
-<div id="MainDialogDiv" title="Translator Properties" style="overflow: auto;">
+<div id="MainDialogDiv" title="Translator Properties" class="inline-editor-source">
     <s:form id="MainDialogForm">
         <s:hidden name="action" ac="lang-save-main-form" />
 
@@ -222,65 +222,9 @@ static const unsigned char * const form_row_attrs[]=
 
 <script type="text/javascript">
 $(function() {
-    limitsDialog = $("#LimitsDialogDiv").dialog({
-        autoOpen: false,
-        height: 350,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#LimitsDialogForm").serialize();
-                var formURL = $("#LimitsDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                limitsDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
 
-    mainDialog = $("#MainDialogDiv").dialog({
-        autoOpen: false,
-        height: 650,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#MainDialogForm").serialize();
-                var formURL = $("#MainDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                mainDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
+
 });
 
 function np(e)
@@ -301,7 +245,7 @@ function copyCheckbox(dst, src)
     }
 }
 
-function popupLimitsDialog(e, skipField)
+function initializeLimitsEditor(e, skipField)
 {
     $("#limits-compile_max_vm_size").val($("#orig-compile_max_vm_size").val());
     $("#limits-compile_max_stack_size").val($("#orig-compile_max_stack_size").val());
@@ -309,14 +253,13 @@ function popupLimitsDialog(e, skipField)
 
     if (e) e.stopPropagation();
     limitsDialogOnChange();
-    $("#LimitsDialogDiv").dialog('open');
 }
 
 function limitsDialogOnChange()
 {
 }
 
-function popupMainDialog(compile_id, e, skipField)
+function initializeMainEditor(compile_id, e, skipField)
 {
     $("#main-lang_id").val($("#orig-lang_id-" + compile_id).val());
     $("#main-compile_id").val($("#orig-compile_id-" + compile_id).val());
@@ -354,7 +297,6 @@ function popupMainDialog(compile_id, e, skipField)
 
     if (e) e.stopPropagation();
     mainDialogOnChange();
-    $("#MainDialogDiv").dialog('open');
 }
 
 function mainDialogOnChange()
@@ -369,6 +311,11 @@ function mainDialogOnChange()
     int lang_ajax_action_2 = SSERV_CMD_LANG_AJAX_ACTION;
 %>
 function newLanguageEnableImport()
+{
+    ejInline.flush(function() { newLanguageEnableImportSaved(); });
+}
+
+function newLanguageEnableImportSaved()
 {
     $.ajax({
         url : '<s:v value="phr->self_url" escape="false" />',
@@ -410,7 +357,7 @@ function newLanguageEnableImport()
   }
 %>
 
-    <s:tr attr="head_row_attr" onclick="popupLimitsDialog()">
+    <s:tr attr="head_row_attr">
         <td colspan="5" align="center"><b>Compilation limitations</b></td>
     </s:tr>
 
@@ -420,7 +367,7 @@ function newLanguageEnableImport()
     ll_to_size_str(num_buf, sizeof(num_buf), global->compile_max_vm_size);
   }
 %>
-    <s:tr id="orig-compile_max_vm_size-div" attr="form_row_attrs[row ^= 1]" onclick="popupLimitsDialog()">
+    <s:tr id="orig-compile_max_vm_size-div" attr="form_row_attrs[row ^= 1]">
         <td colspan="2">Maximum VM size for compilers:</td>
         <td><s:textfield id="orig-compile_max_vm_size" readonly="readonly" name="param" value="num_buf" size="48" maxlength="1024" check="no" /></td>
         <td>&nbsp;</td>
@@ -433,7 +380,7 @@ function newLanguageEnableImport()
     ll_to_size_str(num_buf, sizeof(num_buf), global->compile_max_stack_size);
   }
 %>
-    <s:tr id="orig-compile_max_stack_size-div" attr="form_row_attrs[row ^= 1]" onclick="popupLimitsDialog()">
+    <s:tr id="orig-compile_max_stack_size-div" attr="form_row_attrs[row ^= 1]">
         <td colspan="2">Maximum stack size for compilers:</td>
         <td><s:textfield id="orig-compile_max_stack_size" readonly="readonly" name="param" value="num_buf" size="48" maxlength="1024" check="no" /></td>
         <td>&nbsp;</td>
@@ -446,7 +393,7 @@ function newLanguageEnableImport()
     ll_to_size_str(num_buf, sizeof(num_buf), global->compile_max_file_size);
   }
 %>
-    <s:tr id="orig-compile_max_file_size-div" attr="form_row_attrs[row ^= 1]" onclick="popupLimitsDialog()">
+    <s:tr id="orig-compile_max_file_size-div" attr="form_row_attrs[row ^= 1]">
         <td colspan="2">Maximum file size for compilers:</td>
         <td><s:textfield id="orig-compile_max_file_size" readonly="readonly" name="param" value="num_buf" size="48" maxlength="1024" check="no" /></td>
         <td>&nbsp;</td>
@@ -516,7 +463,6 @@ function newLanguageEnableImport()
     int idsuffix = -lang->compile_id;
     int compile_id = lang->compile_id;
     row = 1;
-    snprintf(onclickstr_buf, sizeof(onclickstr_buf), "popupMainDialog(%d)", compile_id);
 
     if (lang->disabled < 0) lang->disabled = 0;
     if (lang->binary < 0) lang->binary = 0;
@@ -534,7 +480,7 @@ function newLanguageEnableImport()
     if (lang->disable_auto_update < 0) lang->disable_auto_update = 0;
 %>
 
-    <s:tr id="orig-lang_id-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-lang_id-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Language ID:</td>
         <td><s:textfield id="orig-lang_id" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->id" size="48" maxlength="1024" /></td>
@@ -542,7 +488,7 @@ function newLanguageEnableImport()
         <td>&nbsp;</td>
     </s:tr>
 
-    <s:tr id="orig-compile_id-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-compile_id-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Compilation server ID:</td>
         <td><s:textfield id="orig-compile_id" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->compile_id" size="48" maxlength="1024" /></td>
@@ -550,7 +496,7 @@ function newLanguageEnableImport()
         <td>&nbsp;</td>
     </s:tr>
 
-    <s:tr id="orig-short_name-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-short_name-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Language short name:</td>
         <td><s:textfield id="orig-short_name" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->short_name" size="48" maxlength="1024" /></td>
@@ -558,7 +504,7 @@ function newLanguageEnableImport()
         <td>&nbsp;</td>
     </s:tr>
 
-    <s:tr id="orig-arch-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-arch-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Language architecture:</td>
         <td><s:textfield id="orig-arch" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->arch" size="48" maxlength="1024" /><% if (!lang->arch || !lang->arch[0]) { %><i>(Default)</i><% } %></td>
@@ -566,7 +512,7 @@ function newLanguageEnableImport()
         <td>&nbsp;</td>
     </s:tr>
 
-    <s:tr id="orig-src_sfx-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-src_sfx-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Suffix of the source files:</td>
         <td><s:textfield id="orig-src_sfx" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->src_sfx" size="48" maxlength="1024" /></td>
@@ -574,7 +520,7 @@ function newLanguageEnableImport()
         <td>&nbsp;</td>
     </s:tr>
 
-    <s:tr id="orig-exe_sfx-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-exe_sfx-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Suffix of the executable files:</td>
         <td><s:textfield id="orig-exe_sfx" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->exe_sfx" size="48" maxlength="1024" /><% if (!lang->exe_sfx || !*lang->exe_sfx) { %><i>(Empty)</i><% } %></td>
@@ -582,23 +528,23 @@ function newLanguageEnableImport()
         <td>&nbsp;</td>
     </s:tr>
 
-    <s:tr id="orig-long_name-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-long_name-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Language long name:</td>
         <td><s:textfield id="orig-long_name" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->long_name" size="48" maxlength="1024" checkExpr="" /></td>
-        <td><input type="button" onclick="popupMainDialog(<s:v value="compile_id" />, event, 'long_name')" value="Clear" /></td>
+        <td><input type="button" onclick="ejInline.clear(event, 'Main', 'long_name')" value="Clear" /></td>
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:long_name" /></td>
     </s:tr>
 
-    <s:tr id="orig-extid-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-extid-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Language external name:</td>
         <td><s:textfield id="orig-extid" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->extid" size="48" maxlength="1024" checkExpr="" /></td>
-        <td><input type="button" onclick="popupMainDialog(<s:v value="compile_id" />, event, 'extid')" value="Clear" /></td>
+        <td><input type="button" onclick="ejInline.clear(event, 'Main', 'extid')" value="Clear" /></td>
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:extid" /></td>
     </s:tr>
 
-    <s:tr id="orig-disabled-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-disabled-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Disable this language for participants:</td>
         <td><s:yesno id="orig-disabled" idSuffix="idsuffix" disabled="disabled" name="param" value="lang->disabled" /></td>
@@ -606,7 +552,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:disabled" /></td>
     </s:tr>
 
-    <s:tr id="orig-insecure-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-insecure-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>This language is insecure:</td>
         <td><s:yesno id="orig-insecure" idSuffix="idsuffix" disabled="disabled"  name="param" value="lang->insecure" /></td>
@@ -614,7 +560,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:insecure" /></td>
     </s:tr>
 
-    <s:tr id="orig-disable_security-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-disable_security-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Disable security restrictions:</td>
         <td><s:yesno id="orig-disable_security" idSuffix="idsuffix" disabled="disabled" name="param" value="lang->disable_security" /></td>
@@ -622,7 +568,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:disable_security" /></td>
     </s:tr>
 
-    <s:tr id="orig-enable_suid_run-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-enable_suid_run-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Enable SUID helper:</td>
         <td><s:yesno id="orig-enable_suid_run" idSuffix="idsuffix" disabled="disabled" name="param" value="lang->enable_suid_run" /></td>
@@ -630,7 +576,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:enable_suid_run" /></td>
     </s:tr>
 
-    <s:tr id="orig-disable_testing-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-disable_testing-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Disable any testing of submissions:</td>
         <td><s:yesno id="orig-disable_testing" idSuffix="idsuffix" disabled="disabled" name="param" value="lang->disable_testing" /></td>
@@ -638,7 +584,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:disable_testing" /></td>
     </s:tr>
 
-    <s:tr id="orig-disable_auto_testing-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf" hiddenExpr="lang->disable_testing > 0" >
+    <s:tr id="orig-disable_auto_testing-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" hiddenExpr="lang->disable_testing > 0" >
         <td width="50">&nbsp;</td>
         <td>Disable automatic testing of submissions:</td>
         <td><s:yesno id="orig-disable_auto_testing" idSuffix="idsuffix" disabled="disabled" name="param" value="lang->disable_auto_testing" /></td>
@@ -646,7 +592,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:disable_auto_testing" /></td>
     </s:tr>
 
-    <s:tr id="orig-binary-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-binary-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Language source files are binary:</td>
         <td><s:yesno id="orig-binary" idSuffix="idsuffix" disabled="disabled" name="param" value="lang->binary" /></td>
@@ -654,7 +600,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:binary" /></td>
     </s:tr>
 
-    <s:tr id="orig-is_dos-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-is_dos-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Perform UNIX->DOS conversion:</td>
         <td><s:yesno id="orig-is_dos" idSuffix="idsuffix" disabled="disabled" name="param" value="lang->is_dos" /></td>
@@ -662,7 +608,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:is_dos" /></td>
     </s:tr>
 
-    <s:tr id="orig-enable_ejudge_env-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-enable_ejudge_env-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Enable ejudge env vars:</td>
         <td><s:yesno id="orig-enable_ejudge_env" idSuffix="idsuffix" disabled="disabled"  name="param" value="lang->enable_ejudge_env" /></td>
@@ -670,7 +616,7 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:enable_ejudge_env" /></td>
     </s:tr>
 
-    <s:tr id="orig-preserve_line_numbers-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-preserve_line_numbers-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Preserve line numbers:</td>
         <td><s:yesno id="orig-preserve_line_numbers" idSuffix="idsuffix" disabled="disabled"  name="param" value="lang->preserve_line_numbers" /></td>
@@ -684,7 +630,7 @@ function newLanguageEnableImport()
       ll_to_size_str(num_buf, sizeof(num_buf), lang->max_vm_size);
     }
 %>
-    <s:tr id="orig-max_vm_size-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-max_vm_size-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Maximum VM size:</td>
         <td><s:textfield id="orig-max_vm_size" idSuffix="idsuffix" readonly="readonly" name="param" value="num_buf" size="48" maxlength="1024" check="false" /></td>
@@ -698,7 +644,7 @@ function newLanguageEnableImport()
       ll_to_size_str(num_buf, sizeof(num_buf), lang->max_stack_size);
     }
 %>
-    <s:tr id="orig-max_stack_size-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-max_stack_size-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Maximum stack size:</td>
         <td><s:textfield id="orig-max_stack_size" idSuffix="idsuffix" readonly="readonly" name="param" value="num_buf" size="48" maxlength="1024" check="false" /></td>
@@ -712,7 +658,7 @@ function newLanguageEnableImport()
       ll_to_size_str(num_buf, sizeof(num_buf), lang->max_file_size);
     }
 %>
-    <s:tr id="orig-max_file_size-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-max_file_size-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Maximum file size:</td>
         <td><s:textfield id="orig-max_file_size" idSuffix="idsuffix" readonly="readonly" name="param" value="num_buf" size="48" maxlength="1024" check="false" /></td>
@@ -720,19 +666,19 @@ function newLanguageEnableImport()
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:max_file_size" /></td>
     </s:tr>
 
-    <s:tr id="orig-content_type-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf" hiddenExpr="lang->binary <= 0">
+    <s:tr id="orig-content_type-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" hiddenExpr="lang->binary <= 0">
         <td width="50">&nbsp;</td>
         <td>Content type for files:</td>
         <td><s:textfield id="orig-content_type" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->content_type" size="48" maxlength="1024" checkExpr="" /></td>
-        <td><input type="button" onclick="popupMainDialog(<s:v value="compile_id" />, event, 'content_type')" value="Clear" /></td>
+        <td><input type="button" onclick="ejInline.clear(event, 'Main', 'content_type')" value="Clear" /></td>
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:content_type" /></td>
     </s:tr>
 
-    <s:tr id="orig-style_checker_cmd-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-style_checker_cmd-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Style checker command:</td>
         <td><s:textfield id="orig-style_checker_cmd" idSuffix="idsuffix" readonly="readonly" name="param" value="lang->style_checker_cmd" size="48" maxlength="1024" checkExpr="" /></td>
-        <td><input type="button" onclick="popupMainDialog(<s:v value="compile_id" />, event, 'style_checker_cmd')" value="Clear" /></td>
+        <td><input type="button" onclick="ejInline.clear(event, 'Main', 'style_checker_cmd')" value="Clear" /></td>
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:style_checker_cmd" /></td>
     </s:tr>
 
@@ -742,30 +688,30 @@ function newLanguageEnableImport()
       env = sarray_unparse(lang->style_checker_env);
     }
 %>
-    <s:tr id="orig-style_checker_env-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-style_checker_env-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Style checker environment:</td>
         <td><s:textfield id="orig-style_checker_env" idSuffix="idsuffix" readonly="readonly" name="param" value="env" size="48" maxlength="1024" checkExpr="" /></td>
-        <td><input type="button" onclick="popupMainDialog(<s:v value="compile_id" />, event, 'style_checker_env')" value="Clear" /></td>
+        <td><input type="button" onclick="ejInline.clear(event, 'Main', 'style_checker_env')" value="Clear" /></td>
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:style_checker_env" /></td>
     </s:tr>
 <%
     xfree(env); env = 0;
 %>
 
-    <s:tr id="orig-opts-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-opts-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Additional compilation options:</td>
         <td><s:textfield id="orig-opts" idSuffix="idsuffix" readonly="readonly" name="param" value="phr->ss->lang_opts[lang->id]" size="48" maxlength="1024" checkExpr="" /></td>
-        <td><input type="button" onclick="popupMainDialog(<s:v value="compile_id" />, event, 'opts')" value="Clear" /></td>
+        <td><input type="button" onclick="ejInline.clear(event, 'Main', 'opts')" value="Clear" /></td>
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:opts" /></td>
     </s:tr>
 
-    <s:tr id="orig-libs-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]" onclickExpr="onclickstr_buf">
+    <s:tr id="orig-libs-div" idSuffix="idsuffix" attr="form_row_attrs[row ^= 1]">
         <td width="50">&nbsp;</td>
         <td>Additional libraries:</td>
         <td><s:textfield id="orig-libs" idSuffix="idsuffix" readonly="readonly" name="param" value="phr->ss->lang_libs[lang->id]" size="48" maxlength="1024" checkExpr="" /></td>
-        <td><input type="button" onclick="popupMainDialog(<s:v value="compile_id" />, event, 'libs')" value="Clear" /></td>
+        <td><input type="button" onclick="ejInline.clear(event, 'Main', 'libs')" value="Clear" /></td>
         <td onclick="np(event);"><s:help topic="Serve.cfg:language:libs" /></td>
     </s:tr>
 
@@ -793,6 +739,23 @@ function newLanguageEnableImport()
 </table>
 
 <s:form><table><tr><td><s:submit ac="lang-update-versions" label="Update versions" /></td></tr></table></s:form>
+
+
+<script type="text/javascript">
+$(function() {
+    if (!document.getElementById("LimitsDialogForm")) return;
+    initializeLimitsEditor();
+    ejInline.mount("Limits");
+    var template = $("#MainDialogDiv");
+    $("input[id^='orig-compile_id-']").each(function() {
+        var compileId = this.value;
+        initializeMainEditor(compileId);
+        ejInline.mountLanguage(template, compileId);
+    });
+    template.remove();
+    ejInline.start();
+});
+</script>
 
 <%
 bottom_links: ;

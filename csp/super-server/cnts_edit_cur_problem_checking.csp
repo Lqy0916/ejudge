@@ -1,6 +1,6 @@
 <% // -*- html -*-
 %>
-<div id="CheckingDialogDiv" title="Checking" style="overflow: auto;">
+<div id="CheckingDialogDiv" title="Checking" class="inline-editor-source">
     <s:form id="CheckingDialogForm">
         <s:hidden name="action" ac="prob-save-checking-form" />
         <input type="hidden" id="CheckingDialogProbId" name="prob_id" value="" />
@@ -50,35 +50,7 @@
 
 <script type="text/javascript">
 $(function() {
-    checkingDialog = $("#CheckingDialogDiv").dialog({
-        autoOpen: false,
-        height: 500,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#CheckingDialogForm").serialize();
-                var formURL = $("#CheckingDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                checkingDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     var has_standard_checker = <s:v type="jsbool" value="tmp_prob->standard_checker" />;
     $("#orig-check_cmd-div").toggle(!has_standard_checker);
@@ -98,7 +70,7 @@ $(function() {
     $("#orig-init_env-div").toggle(has_init && <s:v type="jsbool" value="prob_id > 0" />);
 });
 
-function popupCheckingDialog(e, skipField)
+function initializeCheckingEditor(e, skipField)
 {
     $("#CheckingDialogProbId").val(prob_id);
 
@@ -146,7 +118,6 @@ function popupCheckingDialog(e, skipField)
 
     if (e) e.stopPropagation();
     checkingDialogOnChange();
-    $("#CheckingDialogDiv").dialog('open');
 }
 
 function checkingDialogOnChange(field)

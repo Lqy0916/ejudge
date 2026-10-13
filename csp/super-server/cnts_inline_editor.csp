@@ -1,0 +1,14 @@
+<style type="text/css">
+.inline-editor-source { display: none; }
+.inline-field { display: inline-block; max-width: 100%; }
+.inline-field input[type="text"], .inline-field select { max-width: 100%; box-sizing: border-box; }
+.inline-field-label { position: absolute; width: 1px !important; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.inline-original-value { display: none; }
+.inline-save-status { position: sticky; bottom: 0; padding: 10px; background: #eff5fc; border-top: 1px solid #abc; white-space: pre-line; z-index: 20; }
+.inline-save-status button { margin-left: 12px; }
+.inline-error { color: #a40000; font-weight: bold; }
+</style>
+<script type="text/javascript">
+var ejInlineForgetAction = <s:ac ac="cnts-forget" />;
+</script>
+<script src="<s:config name="style-prefix" />priv_inline_edit.js" type="text/javascript"></script>

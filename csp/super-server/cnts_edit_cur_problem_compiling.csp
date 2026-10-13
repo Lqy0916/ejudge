@@ -1,6 +1,6 @@
 <% // -*- html -*-
 %>
-<div id="CompilingDialogDiv" title="Compiling" style="overflow: auto;">
+<div id="CompilingDialogDiv" title="Compiling" class="inline-editor-source">
     <s:form id="CompilingDialogForm">
         <s:hidden name="action" ac="prob-save-compiling-form" />
         <input type="hidden" id="CompilingDialogProbId" name="prob_id" value="" />
@@ -16,41 +16,13 @@
 
 <script type="text/javascript">
 $(function() {
-    compilingDialog = $("#CompilingDialogDiv").dialog({
-        autoOpen: false,
-        height: 350,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#CompilingDialogForm").serialize();
-                var formURL = $("#CompilingDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                compilingDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-lang_compiler_env-div").toggle(<s:v type="jsbool" value="prob_id > 0" />);
     $("#orig-style_checker_env-div").toggle(<s:v type="jsbool" value="tmp_prob->style_checker_cmd && prob_id > 0" />);
 });
 
-function popupCompilingDialog(e, skipField)
+function initializeCompilingEditor(e, skipField)
 {
     $("#CompilingDialogProbId").val(prob_id);
 
@@ -68,7 +40,6 @@ function popupCompilingDialog(e, skipField)
 
     if (e) e.stopPropagation();
     compilingDialogOnChange();
-    $("#CompilingDialogDiv").dialog('open');
 }
 
 function compilingDialogOnChange(field)

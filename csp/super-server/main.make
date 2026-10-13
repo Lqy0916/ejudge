@@ -78,6 +78,7 @@ CFILES = \
  csp_cnts_save_attrs_form.c\
  csp_cnts_save_notifications_form.c\
  csp_cnts_save_advanced_form.c\
+ csp_cnts_save_contest_form.c\
  csp_glob_save_main_form.c\
  csp_glob_save_capabilities_form.c\
  csp_glob_save_files_form.c\
@@ -188,6 +189,7 @@ csp_cnts_save_headers_form.c : cnts_save_headers_form.csp includes.csp stdvars.c
 csp_cnts_save_attrs_form.c : cnts_save_attrs_form.csp includes.csp stdvars.csp
 csp_cnts_save_notifications_form.c : cnts_save_notifications_form.csp includes.csp stdvars.csp
 csp_cnts_save_advanced_form.c : cnts_save_advanced_form.csp includes.csp stdvars.csp
+csp_cnts_save_contest_form.c : cnts_save_contest_form.csp includes.csp stdvars.csp
 csp_glob_save_main_form.c : glob_save_main_form.csp includes.csp stdvars.csp
 csp_glob_save_capabilities_form.c : glob_save_capabilities_form.csp includes.csp stdvars.csp
 csp_glob_save_files_form.c : glob_save_files_form.csp includes.csp stdvars.csp
@@ -255,3 +257,9 @@ csp_%.c : %.csp
 %.so : %.o
 	$(CC) $(LDFLAGS) $< -o $@
 
+
+csp_cnts_edit_cur_global_page.c : cnts_inline_editor.csp
+
+csp_cnts_edit_cur_problem_page.c : cnts_inline_editor.csp
+
+csp_cnts_edit_cur_languages_page.c : cnts_inline_editor.csp

@@ -75,4 +75,6 @@ cleanup:;
 <%
     html_armor_free(&ab);
     xfree(msg_s);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

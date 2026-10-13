@@ -102,4 +102,6 @@ cleanup:;
     sarray_free(lang_compiler_env);
     xfree(source_header);
     xfree(source_footer);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

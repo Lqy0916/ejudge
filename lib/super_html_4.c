@@ -607,6 +607,7 @@ static const unsigned char * const external_action_names[SSERV_CMD_LAST] =
   [SSERV_CMD_USER_SEL_RANDOM_PASSWD_PAGE] = "user_sel_random_passwd_page",
   [SSERV_CMD_EDIT_SESSIONS_PAGE] = "edit_sessions_page",
   [SSERV_CMD_LANG_AJAX_ACTION] = "lang_ajax_action",
+  [SSERV_CMD_CNTS_SAVE_CONTEST_FORM] = "cnts_save_contest_form",
 };
 
 static const unsigned char * const external_error_names[SSERV_ERR_LAST] =

@@ -258,4 +258,6 @@ cleanup:;
     sarray_free(interactor_env);
     xfree(init_cmd);
     sarray_free(init_env);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

@@ -145,4 +145,6 @@ cleanup:;
     sarray_free(disable_language);
     sarray_free(enable_language);
     sarray_free(require);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

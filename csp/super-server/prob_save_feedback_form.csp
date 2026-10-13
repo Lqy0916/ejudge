@@ -148,4 +148,6 @@ cleanup:;
     xfree(final_open_tests);
     xfree(tokens);
     xfree(token_open_tests);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

@@ -187,4 +187,6 @@ cleanup:;
     xfree(score_tests);
     sarray_free(test_sets);
     xfree(score_bonus);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

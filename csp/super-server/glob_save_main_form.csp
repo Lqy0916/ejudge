@@ -104,13 +104,16 @@
             phr->ss->enable_win32_languages = enable_win32_languages;
             if (enable_win32_languages) {
                 // check, that win32_compile is already added
+                int found_win32_compile = 0;
                 if (global->extra_compile_dirs) {
                     for (int i = 0; global->extra_compile_dirs[i]; ++i) {
                         if (!strcmp(global->extra_compile_dirs[i], "win32_compile"))
-                            return 0;
+                            found_win32_compile = 1;
                     }
                 }
-                global->extra_compile_dirs = sarray_append(global->extra_compile_dirs, "win32_compile");
+                if (!found_win32_compile) {
+                    global->extra_compile_dirs = sarray_append(global->extra_compile_dirs, "win32_compile");
+                }
             }
             global->separate_user_score = separate_user_score;
             global->secure_run = secure_run;
@@ -140,4 +143,6 @@ cleanup:;
 <%
     html_armor_free(&ab);
     xfree(msg_s);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

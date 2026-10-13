@@ -210,4 +210,6 @@ cleanup:;
     sarray_free(lang_max_vm_size);
     sarray_free(lang_max_stack_size);
     sarray_free(lang_max_rss_size);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>

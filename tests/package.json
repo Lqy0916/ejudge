@@ -1,0 +1,10 @@
+{
+  "name": "ejudge-inline-settings-tests",
+  "private": true,
+  "scripts": {
+    "test": "node --test contest_settings_autosave.test.js inline_settings.test.js inline_templates.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

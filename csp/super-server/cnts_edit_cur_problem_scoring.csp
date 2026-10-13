@@ -1,6 +1,6 @@
 <% // -*- html -*-
 %>
-<div id="ScoringDialogDiv" title="Scoring" style="overflow: auto;">
+<div id="ScoringDialogDiv" title="Scoring" class="inline-editor-source">
     <s:form id="ScoringDialogForm">
         <s:hidden name="action" ac="prob-save-scoring-form" />
         <input type="hidden" id="ScoringDialogProbId" name="prob_id" value="" />
@@ -33,35 +33,7 @@
 
 <script type="text/javascript">
 $(function() {
-    scoringDialog = $("#ScoringDialogDiv").dialog({
-        autoOpen: false,
-        height: 600,
-        width: 650,
-        modal: true,
-        buttons: {
-            "Save": function() {
-                var postData = $("#ScoringDialogForm").serialize();
-                var formURL = $("#ScoringDialogForm").attr("action");
-                $.ajax({
-                    url : formURL,
-                    type: "POST",
-                    data : postData,
-                    success:function(data, textStatus, jqXHR) {
-                        //data: return data from server
-                        document.location.reload(true);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails
-                    }
-                });
-            },
-            Cancel: function() {
-                scoringDialog.dialog("close");
-            }
-        },
-        close : function() {
-        }
-    });
+
 
     $("#orig-use_ac_not_ok-div").toggle(<s:v type="jsbool" value="!tmp_prob->ok_status" />);
     $("#orig-ok_status-div").toggle(<s:v type="jsbool" value="tmp_prob->use_ac_not_ok <= 0" />);
@@ -86,7 +58,7 @@ $(function() {
     $("#orig-score_bonus-div").toggle(global_score_kirov_olympiad && <s:v type="jsbool" value="prob_id > 0" />);
 });
 
-function popupScoringDialog(e, skipField)
+function initializeScoringEditor(e, skipField)
 {
     $("#ScoringDialogProbId").val(prob_id);
 
@@ -128,7 +100,6 @@ function popupScoringDialog(e, skipField)
 
     if (e) e.stopPropagation();
     scoringDialogOnChange();
-    $("#ScoringDialogDiv").dialog('open');
 }
 
 function scoringDialogOnChange(field)

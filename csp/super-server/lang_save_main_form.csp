@@ -120,8 +120,9 @@ cleanup:;
     xfree(extid);
     xfree(content_type);
     xfree(style_checker_cmd);
-    xfree(style_checker_env);
     xfree(opts);
     xfree(libs);
     sarray_free(style_checker_env);
+    // Validation is reported in the JSON body, not the render return.
+    retval = 0;
 %>
